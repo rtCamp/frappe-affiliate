@@ -9,7 +9,8 @@
   "minimum_threshold",
   "payment_delay",
   "first_commission_rate",
-  "subsequent_commission_rate"
+  "subsequent_commission_rate",
+  "banners"
  ],
  "fields": [
   {
@@ -36,13 +37,19 @@
    "fieldname": "subsequent_commission_rate",
    "fieldtype": "Percent",
    "label": "Subsequent commission rate"
+  },
+  {
+   "fieldname": "banners",
+   "fieldtype": "Table",
+   "label": "Banners",
+   "options": "Affiliate Banners"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-08-21 01:39:57.695829",
+ "modified": "2025-09-02 22:37:47.013272",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Settings",

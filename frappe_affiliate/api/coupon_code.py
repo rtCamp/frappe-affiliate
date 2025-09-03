@@ -1,5 +1,9 @@
 import frappe
 
+@frappe.whitelist()
+def get_banners():
+    banners = frappe.get_single("Affiliate Settings").banners
+    return banners
 
 @frappe.whitelist()
 def get_affiliate_coupons(affiliate_id):
