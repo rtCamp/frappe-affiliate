@@ -3,7 +3,7 @@ app_title = "Frappe Affiliate"
 app_publisher = "rtCamp"
 app_description = "Affiliate management app for frappe"
 app_email = "erp@rtcamp.com"
-app_license = "gpl-3.0"
+app_license = "GNU AFFERO GENERAL PUBLIC LICENSE (v3)"
 
 # Apps
 # ------------------
@@ -83,7 +83,7 @@ app_license = "gpl-3.0"
 # ------------
 
 # before_install = "frappe_affiliate.install.before_install"
-# after_install = "frappe_affiliate.install.after_install"
+after_install = "frappe_affiliate.install.after_install"
 
 # Uninstallation
 # ------------
@@ -129,22 +129,25 @@ app_license = "gpl-3.0"
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-# 	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {
+    "Subscription": "frappe_affiliate.override.subscription_override.SubscriptionOverride",
+}
 
 # Document Events
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
-
+doc_events = {
+    "Sales Partner": {
+        "after_insert": ["frappe_affiliate.doc_events.sales_partner.after_insert"],
+    },
+    "Customer": {
+        "on_update": "frappe_affiliate.doc_events.customer.on_update",
+    },
+    "Sales Invoice": {
+        "validate": ["frappe_affiliate.doc_events.sales_invoice.validate"],
+    },
+}
 # Scheduled Tasks
 # ---------------
 
@@ -242,3 +245,25 @@ app_license = "gpl-3.0"
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+fixtures = [
+    {
+        "dt": "Property Setter",
+        "filters": [
+            [
+                "module",
+                "in",
+                ["Frappe Affiliate"],
+            ]
+        ],
+    },
+    {
+        "dt": "Custom Field",
+        "filters": [
+            [
+                "module",
+                "in",
+                ["Frappe Affiliate"],
+            ]
+        ],
+    },
+]

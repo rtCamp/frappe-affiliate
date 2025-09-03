@@ -1,0 +1,66 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-08-21 01:36:19.920769",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "cookie_timeout",
+  "minimum_threshold",
+  "payment_delay",
+  "first_commission_rate",
+  "subsequent_commission_rate"
+ ],
+ "fields": [
+  {
+   "fieldname": "cookie_timeout",
+   "fieldtype": "Int",
+   "label": "Cookie Timeout"
+  },
+  {
+   "fieldname": "minimum_threshold",
+   "fieldtype": "Int",
+   "label": "Minimum Threshold"
+  },
+  {
+   "fieldname": "payment_delay",
+   "fieldtype": "Int",
+   "label": "Payment Delay"
+  },
+  {
+   "fieldname": "first_commission_rate",
+   "fieldtype": "Percent",
+   "label": "First commission rate"
+  },
+  {
+   "fieldname": "subsequent_commission_rate",
+   "fieldtype": "Percent",
+   "label": "Subsequent commission rate"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2025-08-21 01:39:57.695829",
+ "modified_by": "Administrator",
+ "module": "Frappe Affiliate",
+ "name": "Affiliate Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
