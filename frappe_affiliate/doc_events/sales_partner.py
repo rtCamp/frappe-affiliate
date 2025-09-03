@@ -14,4 +14,4 @@ def after_insert(doc, method=None):
             "supplier_group": "Sales Partner",
         }
     )
-    supplier.insert()
+    supplier.insert(ignore_permissions=True)
