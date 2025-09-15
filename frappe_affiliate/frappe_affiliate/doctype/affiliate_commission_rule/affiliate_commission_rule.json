@@ -8,6 +8,7 @@
  "field_order": [
   "first_commission",
   "priority",
+  "comment",
   "column_break_cdoo",
   "subsequent_commission",
   "disabled",
@@ -57,12 +58,17 @@
    "fieldname": "priority",
    "fieldtype": "Int",
    "label": "Priority"
+  },
+  {
+   "fieldname": "comment",
+   "fieldtype": "Data",
+   "label": "Comment"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-15 00:25:47.733213",
+ "modified": "2025-09-15 01:59:10.357061",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Commission Rule",

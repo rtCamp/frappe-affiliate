@@ -11,6 +11,7 @@ def get_commission_rules():
             "subsequent_commission",
             "disabled",
             "priority",
+            "comment",
         ],
         order_by="priority asc",
     )
@@ -35,6 +36,7 @@ def get_commission_rules():
                 "priority": commission_rule.priority,
                 "apply_on": apply_on_items,
                 "apply_except": apply_except_items,
+                "comment": commission_rule.comment,
             }
         )
     return commission_rules
