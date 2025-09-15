@@ -141,9 +141,6 @@ doc_events = {
     "Sales Partner": {
         "after_insert": ["frappe_affiliate.doc_events.sales_partner.after_insert"],
     },
-    "Customer": {
-        "on_update": "frappe_affiliate.doc_events.customer.on_update",
-    },
     "Sales Invoice": {
         "validate": ["frappe_affiliate.doc_events.sales_invoice.validate"],
     },
