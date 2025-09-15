@@ -7,11 +7,13 @@
  "engine": "InnoDB",
  "field_order": [
   "first_commission",
+  "priority",
   "column_break_cdoo",
   "subsequent_commission",
   "disabled",
   "apply_on_section",
-  "item_code"
+  "apply_on",
+  "apply_except"
  ],
  "fields": [
   {
@@ -26,13 +28,7 @@
   {
    "fieldname": "apply_on_section",
    "fieldtype": "Section Break",
-   "label": "Apply On"
-  },
-  {
-   "fieldname": "item_code",
-   "fieldtype": "Table",
-   "label": "Item Code",
-   "options": "Commission Rule Item Code"
+   "label": "Apply On and Except"
   },
   {
    "default": "0",
@@ -44,12 +40,29 @@
    "fieldname": "subsequent_commission",
    "fieldtype": "Percent",
    "label": "Subsequent Commission"
+  },
+  {
+   "fieldname": "apply_except",
+   "fieldtype": "Table",
+   "label": "Apply Except",
+   "options": "Commission Rule Item Code"
+  },
+  {
+   "fieldname": "apply_on",
+   "fieldtype": "Table",
+   "label": "Apply On",
+   "options": "Commission Rule Item Code"
+  },
+  {
+   "fieldname": "priority",
+   "fieldtype": "Int",
+   "label": "Priority"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-26 22:58:40.137273",
+ "modified": "2025-09-15 00:25:47.733213",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Commission Rule",

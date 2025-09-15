@@ -34,8 +34,13 @@ def apply_commission_rules(doc):
 
     for rule in commission_rules:
         rule_doc = frappe.get_doc("Affiliate Commission Rule", rule.name)
-        rule_item_codes = set(child.item_code for child in rule_doc.item_code)
-        if invoice_item_codes.issubset(rule_item_codes):
+        apply_on_rule_item_codes = set(child.item_code for child in rule_doc.apply_on)
+        apply_except_rule_item_codes = set(
+            child.item_code for child in rule_doc.apply_except
+        )
+        if invoice_item_codes.issubset(
+            apply_on_rule_item_codes
+        ) and not invoice_item_codes.intersection(apply_except_rule_item_codes):
             commission_rule = rule_doc
             break
 
