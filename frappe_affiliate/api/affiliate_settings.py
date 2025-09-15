@@ -12,7 +12,7 @@ def get_affiliate_settings():
     return {
         "cookie_timeout": settings.cookie_timeout or 1,
         "minimum_payout": settings.minimum_payout or 0,
-        "payment_delay": settings.payment_delay or 0,
+        "delay_payout_days": settings.delay_payout_days or 0,
         "enable_keywords_support": settings.enable_keywords_support,
     }
 
