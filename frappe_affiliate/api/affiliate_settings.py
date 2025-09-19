@@ -25,7 +25,7 @@ def get_banners():
         banner_dict = {
             "name": banner.name,
             "image": frappe.utils.get_url(
-                frappe.db.get_value("File", banner.banner_link, "file_url")
+                frappe.db.get_value("File", banner.banner, "file_url")
             ),
             "url": banner.url,
             "title": banner.title,

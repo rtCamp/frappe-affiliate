@@ -7,7 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "title",
-  "banner_link",
+  "banner",
   "url",
   "description",
   "width",
@@ -46,27 +46,27 @@
    "label": "Height"
   },
   {
-   "fieldname": "banner_link",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Banner",
-   "options": "File"
-  },
-  {
    "default": "0",
    "fieldname": "disabled",
    "fieldtype": "Check",
    "label": "Disabled"
+  },
+  {
+   "fieldname": "banner",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Banner",
+   "options": "File"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-09-14 21:13:01.455225",
+ "modified": "2025-09-17 05:36:06.123194",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
- "name": "Affiliate Banners",
+ "name": "Affiliate Banner",
  "owner": "Administrator",
  "permissions": [],
  "row_format": "Dynamic",
