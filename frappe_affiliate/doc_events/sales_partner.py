@@ -9,7 +9,7 @@ def after_insert(doc, method=None):
     supplier = frappe.get_doc(
         {
             "doctype": "Supplier",
-            "supplier_name": doc.name,
+            "supplier_name": doc.partner_name,
             "supplier_type": "Individual",
             "supplier_group": "Sales Partner",
         }

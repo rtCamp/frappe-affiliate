@@ -4,3 +4,5 @@
 
 [post_model_sync]
 # Patches added in this section will be executed after doctypes are migrated
+execute:frappe.db.create_sequence('Sales Partner',check_not_exists=True)
+execute:frappe.db.create_sequence('Supplier',check_not_exists=True)
