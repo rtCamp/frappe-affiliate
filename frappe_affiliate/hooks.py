@@ -139,6 +139,7 @@ override_doctype_class = {
 
 doc_events = {
     "Sales Partner": {
+        "before_insert": ["frappe_affiliate.doc_events.sales_partner.before_insert"],
         "after_insert": ["frappe_affiliate.doc_events.sales_partner.after_insert"],
     },
     "Sales Invoice": {
