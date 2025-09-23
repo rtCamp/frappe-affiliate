@@ -6,28 +6,24 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "item_code",
-  "uom"
+  "item_code"
  ],
  "fields": [
   {
+   "allow_in_quick_entry": 1,
    "fieldname": "item_code",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Item Code",
-   "options": "Item"
-  },
-  {
-   "fieldname": "uom",
-   "fieldtype": "Link",
-   "label": "UOM",
-   "options": "UOM"
+   "options": "Item",
+   "reqd": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-09-04 01:59:50.701297",
+ "modified": "2025-09-21 22:02:57.108155",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Commission Rule Item Code",

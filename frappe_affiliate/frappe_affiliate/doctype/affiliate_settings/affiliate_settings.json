@@ -10,6 +10,7 @@
   "delay_payout_days",
   "first_commission_rate",
   "subsequent_commission_rate",
+  "affiliate_route_path",
   "enable_keywords_support",
   "banners"
  ],
@@ -50,13 +51,18 @@
    "fieldname": "enable_keywords_support",
    "fieldtype": "Check",
    "label": "Enable Keywords Support"
+  },
+  {
+   "fieldname": "affiliate_route_path",
+   "fieldtype": "Data",
+   "label": "Affiliate Route Path"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-09-17 05:34:51.480644",
+ "modified": "2025-09-21 01:45:30.381687",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Settings",

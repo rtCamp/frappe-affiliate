@@ -3,7 +3,7 @@ __version__ = "0.0.1"
 import json
 
 import frappe
-from erpnext.accounts.doctype.pricing_rule import pricing_rule
+from erpnext.accounts.doctype.pricing_rule import pricing_rule  # nosemgrep
 from erpnext.accounts.doctype.pricing_rule.pricing_rule import (
     apply_price_discount_rule,
     get_pricing_rule_details,
@@ -14,8 +14,7 @@ from erpnext.accounts.doctype.pricing_rule.pricing_rule import (
 
 
 def monkey_patch():
-    # nosemgrep
-    pricing_rule.get_pricing_rule_for_item = get_pricing_rule_for_item
+    pricing_rule.get_pricing_rule_for_item = get_pricing_rule_for_item  # nosemgrep
 
 
 def get_pricing_rule_for_item(args, doc=None, for_validate=False):
@@ -167,7 +166,6 @@ def get_pricing_rule_for_item(args, doc=None, for_validate=False):
 
 
 try:
-    # nosemgrep
     monkey_patch()
 except Exception:
     pass

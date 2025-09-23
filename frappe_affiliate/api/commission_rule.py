@@ -12,6 +12,7 @@ def get_commission_rules():
             "disabled",
             "priority",
             "comment",
+            "apply_on_group",
         ],
         order_by="priority asc",
     )
