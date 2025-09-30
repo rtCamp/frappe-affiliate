@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class AffiliateBanner(Document):
+class AffiliateBannerandTextLink(Document):
     pass

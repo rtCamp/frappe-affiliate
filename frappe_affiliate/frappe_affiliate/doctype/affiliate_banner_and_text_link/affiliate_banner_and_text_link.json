@@ -1,0 +1,106 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-09-02 21:55:25.470245",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "type",
+  "title",
+  "banner",
+  "redirect_url",
+  "width",
+  "height",
+  "available_for_user_group",
+  "description",
+  "disabled",
+  "open_in_new_window"
+ ],
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Description"
+  },
+  {
+   "depends_on": "eval:doc.type === \"Banner\"",
+   "fieldname": "width",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Width",
+   "mandatory_depends_on": "eval:doc.type === \"Banner\""
+  },
+  {
+   "depends_on": "eval:doc.type === \"Banner\"",
+   "fieldname": "height",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Height",
+   "mandatory_depends_on": "eval:doc.type === \"Banner\""
+  },
+  {
+   "default": "0",
+   "fieldname": "disabled",
+   "fieldtype": "Check",
+   "label": "Disabled"
+  },
+  {
+   "depends_on": "eval:doc.type === \"Banner\"",
+   "fieldname": "banner",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Banner",
+   "mandatory_depends_on": "eval:doc.type === \"Banner\"",
+   "options": "File"
+  },
+  {
+   "fieldname": "redirect_url",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Redirect URL"
+  },
+  {
+   "fieldname": "available_for_user_group",
+   "fieldtype": "Link",
+   "label": "Available for User Group",
+   "options": "User Group"
+  },
+  {
+   "default": "0",
+   "fieldname": "open_in_new_window",
+   "fieldtype": "Check",
+   "label": "Open in New Window"
+  },
+  {
+   "allow_in_quick_entry": 1,
+   "default": "Banner",
+   "fieldname": "type",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "Banner\nText Link",
+   "reqd": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-09-26 01:32:17.749035",
+ "modified_by": "Administrator",
+ "module": "Frappe Affiliate",
+ "name": "Affiliate Banner and Text Link",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

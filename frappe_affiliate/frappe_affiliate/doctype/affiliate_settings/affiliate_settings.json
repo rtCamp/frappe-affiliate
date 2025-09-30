@@ -12,7 +12,7 @@
   "subsequent_commission_rate",
   "affiliate_route_path",
   "enable_keywords_support",
-  "banners"
+  "banner_and_text_link"
  ],
  "fields": [
   {
@@ -29,12 +29,6 @@
    "fieldname": "subsequent_commission_rate",
    "fieldtype": "Percent",
    "label": "Subsequent commission rate"
-  },
-  {
-   "fieldname": "banners",
-   "fieldtype": "Table",
-   "label": "Banners",
-   "options": "Affiliate Banner"
   },
   {
    "fieldname": "minimum_payout",
@@ -56,13 +50,19 @@
    "fieldname": "affiliate_route_path",
    "fieldtype": "Data",
    "label": "Affiliate Route Path"
+  },
+  {
+   "fieldname": "banner_and_text_link",
+   "fieldtype": "Table",
+   "label": "Banner and Text Link",
+   "options": "Affiliate Banner and Text Link"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-09-21 01:45:30.381687",
+ "modified": "2025-09-26 01:29:18.619608",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Settings",

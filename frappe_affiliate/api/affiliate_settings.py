@@ -18,21 +18,42 @@ def get_affiliate_settings():
 
 
 @frappe.whitelist()
-def get_banners():
-    banners = frappe.get_single("Affiliate Settings").banners
-    banners_list = []
-    for banner in banners:
-        banner_dict = {
-            "name": banner.name,
-            "image": frappe.utils.get_url(
-                frappe.db.get_value("File", banner.banner, "file_url")
-            ),
-            "url": banner.url,
-            "title": banner.title,
-            "description": banner.description,
-            "width": banner.width,
-            "height": banner.height,
-            "disabled": banner.disabled,
-        }
-        banners_list.append(banner_dict)
-    return banners_list
+def get_banners_and_text_links():
+    return_disabled = False
+    if frappe.has_permission("Affiliate Settings", "write") is True:
+        return_disabled = True
+    user_groups = frappe.get_all(
+        "User Group Member",
+        filters={"user": frappe.session.user, "parenttype": "User Group"},
+        pluck="parent",
+    )
+    fields = [
+        "name",
+        "type",
+        "banner",
+        "redirect_url",
+        "title",
+        "description",
+        "width",
+        "height",
+        "disabled",
+    ]
+    if return_disabled:
+        fields.append("available_for_user_group")
+        fields.append("open_in_new_window")
+    filters = {}
+    if not return_disabled:
+        filters["disabled"] = 0
+        if user_groups:
+            filters["available_for_user_group"] = ["in", [user_groups, "", None]]
+        else:
+            filters["available_for_user_group"] = ["in", ["", None]]
+    banners_text_links = frappe.get_all(
+        "Affiliate Banner and Text Link", filters=filters, fields=fields
+    )
+    for banner_text_link in banners_text_links:
+        if banner_text_link.get("type") == "Banner" and banner_text_link.get("banner"):
+            banner_text_link["banner"] = frappe.utils.get_url(
+                frappe.db.get_value("File", banner_text_link.get("banner"), "file_url")
+            )
+    return banners_text_links
