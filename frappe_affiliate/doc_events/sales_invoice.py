@@ -12,14 +12,14 @@ def validate(doc, method=None):
             and coupon_code_doc.custom_sales_partner != doc.sales_partner
         ):
             affiliate_banned = frappe.db.get_value(
-                "Sales Partner", coupon_code_doc.custom_sales_partner, "banned"
+                "Sales Partner", coupon_code_doc.custom_sales_partner, "custom_banned"
             )
             if not affiliate_banned:
                 doc.sales_partner = coupon_code_doc.custom_sales_partner
 
     if doc.sales_partner:
         affiliate_banned = frappe.db.get_value(
-            "Sales Partner", doc.sales_partner, "banned"
+            "Sales Partner", doc.sales_partner, "custom_banned"
         )
         if affiliate_banned:
             doc.sales_partner = None
