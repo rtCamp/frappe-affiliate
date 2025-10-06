@@ -4,16 +4,40 @@ from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers import Response
 
 
-def check_banner_embed():
+def handle_affiliate_routes():
     path = local.request.path
-    banner_text_link_route_path = frappe.get_single_value(
-        "Affiliate Settings", "banner_and_text_link_route_path"
-    )
-    if not path.startswith(banner_text_link_route_path):
+    affiliate_settings = frappe.get_cached_doc("Affiliate Settings")
+    cookie_route_path = affiliate_settings.affiliate_route_path
+    banner_text_link_route_path = affiliate_settings.banner_and_text_link_route_path
+
+    if path.startswith(banner_text_link_route_path):
+        check_banner_embed(banner_text_link_route_path)
+    elif path.startswith(cookie_route_path):
+        set_cookie(cookie_route_path, affiliate_settings.cookie_timeout)
+    else:
         return
 
-    path = path.strip(banner_text_link_route_path)
-    parts = path.strip("/").split("/")
+
+def set_cookie(cookie_route_path, cookie_timeout=30):
+    path = local.request.path
+    parts = path[len(cookie_route_path) :].strip("/").split("/")
+    parts_length = len(parts)
+
+    if not parts_length == 1:
+        return
+
+    username = parts[0]
+
+    response = Response("", content_type="text/html")
+    response.set_cookie("affiliate_id", username, max_age=60 * 60 * 24 * cookie_timeout)
+    response.headers["Location"] = "/member"
+    response.status_code = 302
+    raise HTTPException(response=response)
+
+
+def check_banner_embed(banner_text_link_route_path):
+    path = local.request.path
+    parts = path[len(banner_text_link_route_path) :].strip("/").split("/")
     parts_length = len(parts)
 
     if not parts_length == 2:
@@ -27,7 +51,7 @@ def check_banner_embed():
     if not banner_exists:
         return
 
-    banner_text_link = frappe.get_doc("Affiliate Banner and Text Link", slug)
+    banner_text_link = frappe.get_cached_doc("Affiliate Banner and Text Link", slug)
 
     item_type = banner_text_link.type or "Text Link"
     title = banner_text_link.title or ""
@@ -61,11 +85,14 @@ def check_banner_embed():
         }})();
         """
     else:
+        target_attr = (
+            "_blank" if banner_text_link.get("open_in_new_window", False) else "_top"
+        )
         js = f"""
         (function () {{
-            var data = '<a href="{affiliate_link}" rel="nofollow" target="_blank">'
-                + '<img src="{banner_url}" border="0" alt="{title}" width="100%" style="max-width:{banner_text_link.width or 728}px">'
-                + '</a>';
+            var data = '<a href="{affiliate_link}" rel="nofollow" target="{target_attr}">'
+            + '<img src="{banner_url}" border="0" alt="{title}" width="100%" style="max-width:{banner_text_link.width or 728}px">'
+            + '</a>';
             document.write(data);
         }})();
         """
