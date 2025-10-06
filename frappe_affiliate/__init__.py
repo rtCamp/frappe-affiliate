@@ -89,13 +89,13 @@ def get_pricing_rule_for_item(args, doc=None, for_validate=False):
                     recurring_coupon = frappe.db.get_value(
                         doctype="Coupon Code",
                         filters={"name": args.coupon_code},
-                        fieldname="custom_is_recurring",
+                        fieldname="custom_apply_to_recurring",
                     )
                     from frappe_affiliate.api.sales_invoice import get_invoice_count
 
                     invoice_count = get_invoice_count(doc)
                     if invoice_count >= 1 and recurring_coupon:
-                        coupon_fieldname = "custom_second_pricing_rule"
+                        coupon_fieldname = "custom_recurring_pricing_rule"
                     elif invoice_count >= 1 and not recurring_coupon:
                         continue
 
