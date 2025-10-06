@@ -11,6 +11,7 @@
   "first_commission_rate",
   "subsequent_commission_rate",
   "affiliate_route_path",
+  "banner_and_text_link_route_path",
   "enable_keywords_support",
   "banner_and_text_link"
  ],
@@ -56,13 +57,18 @@
    "fieldtype": "Table",
    "label": "Banner and Text Link",
    "options": "Affiliate Banner and Text Link"
+  },
+  {
+   "fieldname": "banner_and_text_link_route_path",
+   "fieldtype": "Data",
+   "label": "Banner and Text Link Route Path"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-09-26 01:29:18.619608",
+ "modified": "2025-10-06 02:36:59.777452",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Settings",

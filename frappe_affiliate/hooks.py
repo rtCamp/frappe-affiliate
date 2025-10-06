@@ -197,7 +197,7 @@ doc_events = {
 
 # Request Events
 # ----------------
-# before_request = ["frappe_affiliate.utils.before_request"]
+before_request = ["frappe_affiliate.banner_embed.check_banner_embed"]
 # after_request = ["frappe_affiliate.utils.after_request"]
 
 # Job Events
