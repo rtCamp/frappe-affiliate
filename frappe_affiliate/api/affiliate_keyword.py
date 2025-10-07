@@ -45,7 +45,7 @@ def get_affiliate_keywords():
             "uniqueClicks": len(unique_clicks),
             "leads": len(leads),
             "sales": len(sales),
-            "referralFees": total_referral_fee,
+            "commissions": total_referral_fee,
         }
 
         keywords.append(keyword_dict)
