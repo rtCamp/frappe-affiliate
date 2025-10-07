@@ -18,19 +18,23 @@ def on_submit(doc, method=None):
         and sales_invoice_doc.total_commission
         and sales_invoice_doc.total_commission > 0
     ):
-        referral = frappe.get_doc(
-            {
-                "doctype": "Affiliate Referral",
-                "sales_partner": sales_invoice_doc.sales_partner,
-                "payment_entry": doc.name,
-                "amount": sales_invoice_doc.total_commission,
-                "date": doc.posting_date,
-                "record_type": "commission",
-                "tier": 0,
-            }
-        ).insert(ignore_permissions=True)
+        record_referral(sales_invoice_doc, doc)
 
-        record_referral_tiers(referral, sales_invoice_doc, doc.name)
+
+def record_referral(sales_invoice_doc, payment_entry_doc):
+    referral = frappe.get_doc(
+        {
+            "doctype": "Affiliate Referral",
+            "sales_partner": sales_invoice_doc.sales_partner,
+            "payment_entry": payment_entry_doc.name,
+            "amount": sales_invoice_doc.total_commission,
+            "date": payment_entry_doc.posting_date,
+            "record_type": "commission",
+            "tier": 0,
+        }
+    ).save(ignore_permissions=True)
+
+    record_referral_tiers(referral, sales_invoice_doc, payment_entry_doc.name)
 
 
 def record_referral_tiers(referral, invoice, payment_entry):
