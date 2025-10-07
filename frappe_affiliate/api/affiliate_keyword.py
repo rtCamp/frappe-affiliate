@@ -18,16 +18,16 @@ def get_affiliate_keywords():
 
     for keyword in keywords_list:
         filters = {"sales_partner": sales_partner, "keyword": keyword.name}
-        clicks = frappe.get_all(
+        clicks = frappe.db.count(
             "Affiliate Click Log", filters=filters, fields=["remote_address"]
         )
-        unique_clicks = frappe.get_all(
+        unique_clicks = frappe.db.count(
             "Affiliate Click Log",
             filters=filters,
             fields=["remote_address"],
             group_by="remote_address",
         )
-        leads = frappe.get_all("Affiliate Lead Log", filters=filters, fields=["name"])
+        leads = frappe.db.count("Affiliate Lead Log", filters=filters, fields=["name"])
         sales = frappe.get_all(
             "Affiliate Referral",
             filters={
@@ -41,9 +41,9 @@ def get_affiliate_keywords():
         total_referral_fee = sum(sales)
         keyword_dict = {
             "keyword": keyword.keyword,
-            "clicks": len(clicks),
-            "uniqueClicks": len(unique_clicks),
-            "leads": len(leads),
+            "clicks": clicks,
+            "uniqueClicks": unique_clicks,
+            "leads": leads,
             "sales": len(sales),
             "commissions": total_referral_fee,
         }
