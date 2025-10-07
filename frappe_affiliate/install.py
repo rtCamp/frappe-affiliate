@@ -15,14 +15,5 @@ def after_install():
         frappe.get_doc(
             {"doctype": "Sales Partner Type", "sales_partner_type": "Affiliate"}
         ).insert()
-    if not frappe.db.exists("User Group", "Affiliate Tier 1"):
-        frappe.get_doc(
-            {"doctype": "User Group", "__newname": "Affiliate Tier 1"}
-        ).insert(ignore_mandatory=True)
-    if not frappe.db.exists("User Group", "Affiliate Tier 2"):
-        frappe.get_doc(
-            {"doctype": "User Group", "__newname": "Affiliate Tier 2"}
-        ).insert(ignore_mandatory=True)
 
-    # nosemgrep
-    frappe.db.commit()
+    frappe.db.commit()  # nosemgrep
