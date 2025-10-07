@@ -3,6 +3,8 @@ from frappe import local
 from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers import Response
 
+from frappe_affiliate.api.affiliate_click_log import record_click
+
 
 def handle_affiliate_routes():
     path = local.request.path
@@ -29,10 +31,55 @@ def set_cookie(cookie_route_path, cookie_timeout=30):
     username = parts[0]
 
     response = Response("", content_type="text/html")
-    response.set_cookie("affiliate_id", username, max_age=60 * 60 * 24 * cookie_timeout)
-    response.headers["Location"] = "/member"
+    banner = frappe.local.request.args.get("banner")
+    banner_exists = frappe.db.exists(
+        "Affiliate Banner and Text Link", {"name": banner, "disabled": 0}
+    )
+    banner_url = "/"
+    if banner_exists:
+        banner_url = get_banner_redirect_url(banner)
+    cookie_val = local.request.cookies.get("affiliate_id")
+    new_val = None
+    cookie_val_length = len(cookie_val.split("-"))
+    cookie_split = cookie_val.split("-") if cookie_val else []
+
+    if cookie_val_length == 2 and banner_exists:
+        click = record_click(username, banner)
+        new_val = f"{username}-{banner}-{click}"
+    elif cookie_val_length == 2 and not banner_exists:
+        if cookie_split[0] != username:
+            click = record_click(username, None)
+            new_val = f"{username}-{click}"
+    elif cookie_val_length == 3 and banner_exists:
+        if (
+            not cookie_val
+            or "-".join(cookie_val.split("-", 2)[:2]) != f"{username}-{banner}"
+        ):
+            click = record_click(username, banner)
+            new_val = f"{username}-{banner}-{click}"
+    elif cookie_val_length == 3 and not banner_exists:
+        if cookie_split[0] != username:
+            click = record_click(username, None)
+            new_val = f"{username}-{click}"
+
+    if new_val:
+        response.set_cookie(
+            "affiliate_id", new_val, max_age=60 * 60 * 24 * cookie_timeout
+        )
+
+    response.headers["Location"] = banner_url
     response.status_code = 302
     raise HTTPException(response=response)
+
+
+def get_banner_redirect_url(banner):
+    if not banner:
+        return None
+
+    banner_text_link = frappe.get_value(
+        "Affiliate Banner and Text Link", banner, "redirect_url"
+    )
+    return banner_text_link or "/"
 
 
 def check_banner_embed(banner_text_link_route_path):
@@ -80,7 +127,7 @@ def check_banner_embed(banner_text_link_route_path):
     if item_type == "Text Link":
         js = f"""
         (function () {{
-            var data = '<a href="{affiliate_link}" rel="nofollow" target="_top">{title}</a>';
+            var data = '<a href="{affiliate_link}?banner={banner_text_link.name}" rel="nofollow" target="_top">{title}</a>';
             document.write(data);
         }})();
         """
@@ -90,7 +137,7 @@ def check_banner_embed(banner_text_link_route_path):
         )
         js = f"""
         (function () {{
-            var data = '<a href="{affiliate_link}" rel="nofollow" target="{target_attr}">'
+            var data = '<a href="{affiliate_link}?banner={banner_text_link.name}" rel="nofollow" target="{target_attr}">'
             + '<img src="{banner_url}" border="0" alt="{title}" width="100%" style="max-width:{banner_text_link.width or 728}px">'
             + '</a>';
             document.write(data);
