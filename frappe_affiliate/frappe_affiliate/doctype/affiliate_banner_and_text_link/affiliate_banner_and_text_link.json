@@ -13,6 +13,7 @@
   "width",
   "height",
   "available_for_user_group",
+  "category",
   "description",
   "disabled",
   "open_in_new_window"
@@ -87,13 +88,18 @@
    "label": "Type",
    "options": "Banner\nText Link",
    "reqd": 1
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Data",
+   "label": "Category"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-09-26 01:32:17.749035",
+ "modified": "2025-10-07 12:34:10.818608",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Banner and Text Link",
