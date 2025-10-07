@@ -24,11 +24,14 @@ class CouponBatch(Document):
             self.generate_batch_coupons()
 
     def generate_single_coupon(self):
+        self.generate_coupon(self.coupon_name, self.coupon_code)
+
+    def generate_coupon(self, coupon_name, coupon_code):
         coupon = frappe.get_doc(
             {
                 "doctype": "Coupon Code",
-                "coupon_name": self.coupon_name,
-                "coupon_code": self.coupon_code,
+                "coupon_name": coupon_name,
+                "coupon_code": coupon_code,
                 "custom_sales_partner": self.sales_partner,
                 "coupon_type": "Promotional",
                 "custom_apply_to_recurring": self.apply_to_recurring,
@@ -40,30 +43,17 @@ class CouponBatch(Document):
                 "custom_coupon_batch": self.name,
             }
         )
-        coupon.insert()
+        coupon.save()
 
     def generate_batch_coupons(self):
         prefix = self.prefix or ""
         prefix_length = len(prefix)
         generate_length = self.code_length - prefix_length
         for i in range(self.coupons_count):
-            coupon = frappe.get_doc(
-                {
-                    "doctype": "Coupon Code",
-                    "coupon_name": f"{self.coupon_name} {i+1}",
-                    "coupon_code": f"{prefix}{frappe.generate_hash()[:generate_length].upper()}",
-                    "custom_sales_partner": self.sales_partner,
-                    "coupon_type": "Promotional",
-                    "custom_apply_to_recurring": self.apply_to_recurring,
-                    "pricing_rule": self.pricing_rule,
-                    "custom_recurring_pricing_rule": self.recurring_pricing_rule,
-                    "valid_from": self.valid_from,
-                    "valid_upto": self.valid_upto,
-                    "maximum_use": self.maximum_use,
-                    "custom_coupon_batch": self.name,
-                }
+            self.generate_coupon(
+                f"{self.coupon_name} {i+1}",
+                f"{prefix}{frappe.generate_hash()[:generate_length].upper()}",
             )
-            coupon.insert()
 
     def update_coupons(self):
         coupons = frappe.get_all(
