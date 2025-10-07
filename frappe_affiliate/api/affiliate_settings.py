@@ -1,4 +1,5 @@
 import frappe
+from frappe import _
 
 
 @frappe.whitelist()
@@ -18,7 +19,7 @@ def get_affiliate_settings():
 
 
 @frappe.whitelist()
-def get_banners_and_text_links():
+def get_banners_and_text_links(name=None, type_filter=None):
     return_disabled = False
     if frappe.has_permission("Affiliate Settings", "write") is True:
         return_disabled = True
@@ -27,33 +28,67 @@ def get_banners_and_text_links():
         filters={"user": frappe.session.user, "parenttype": "User Group"},
         pluck="parent",
     )
-    fields = [
-        "name",
-        "type",
-        "banner",
-        "redirect_url",
-        "title",
-        "description",
-        "width",
-        "height",
-        "disabled",
-    ]
-    if return_disabled:
-        fields.append("available_for_user_group")
-        fields.append("open_in_new_window")
-    filters = {}
-    if not return_disabled:
-        filters["disabled"] = 0
-        if user_groups:
-            filters["available_for_user_group"] = ["in", [user_groups, "", None]]
-        else:
-            filters["available_for_user_group"] = ["in", ["", None]]
-    banners_text_links = frappe.get_all(
-        "Affiliate Banner and Text Link", filters=filters, fields=fields
-    )
-    for banner_text_link in banners_text_links:
-        if banner_text_link.get("type") == "Banner" and banner_text_link.get("banner"):
-            banner_text_link["banner"] = frappe.utils.get_url(
-                frappe.db.get_value("File", banner_text_link.get("banner"), "file_url")
-            )
+    
+    affiliate_settings = frappe.get_single("Affiliate Settings")
+    banners_text_links = []
+    
+    if hasattr(affiliate_settings, 'banner_and_text_link'):
+        for row in affiliate_settings.banner_and_text_link:
+            if name and row.name != name:
+                continue
+            if type_filter and row.type != type_filter:
+                continue
+                
+            if not return_disabled and row.disabled:
+                continue
+
+            if not return_disabled:
+                if user_groups:
+                    if row.available_for_user_group not in [user_groups, "", None]:
+                        continue
+                else:
+                    if row.available_for_user_group not in ["", None]:
+                        continue
+            
+            row_data = {
+                "name": row.name,
+                "type": row.type,
+                "banner": row.banner,
+                "redirect_url": row.redirect_url,
+                "title": row.title,
+                "description": row.description,
+                "width": row.width,
+                "height": row.height,
+                "disabled": row.disabled,
+            }
+            
+            if return_disabled:
+                row_data["available_for_user_group"] = row.available_for_user_group
+                row_data["open_in_new_window"] = row.open_in_new_window
+            
+            
+            banners_text_links.append(row_data)
+    
     return banners_text_links
+
+
+@frappe.whitelist()
+def update_banner_and_text_link(banner_id, **kwargs):
+    """Update a specific banner and text link row in the child table"""
+    try:
+        affiliate_settings = frappe.get_single("Affiliate Settings")
+        if hasattr(affiliate_settings, 'banner_and_text_link'):
+            for row in affiliate_settings.banner_and_text_link:
+                if row.name == banner_id:
+                    for field, value in kwargs.items():
+                        if hasattr(row, field):
+                            setattr(row, field, value)
+                    
+                    affiliate_settings.save()
+                    frappe.db.commit()
+                    return {"success": True, "message": "Banner updated successfully"}
+        
+        return {"success": False, "message": "Banner not found"}
+    except Exception as e:
+        frappe.log_error(_(f"Error updating banner: {str(e)}"))
+        return {"success": False, "message": _(f"Error updating banner: {str(e)}")}
