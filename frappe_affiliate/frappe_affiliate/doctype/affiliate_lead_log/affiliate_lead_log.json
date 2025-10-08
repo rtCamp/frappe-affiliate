@@ -1,0 +1,91 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "autoincrement",
+ "creation": "2025-10-06 12:41:40.681856",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "sales_partner",
+  "user",
+  "time",
+  "banner_id",
+  "remote_address",
+  "referrer",
+  "first_visited",
+  "keyword"
+ ],
+ "fields": [
+  {
+   "fieldname": "sales_partner",
+   "fieldtype": "Link",
+   "label": "Sales Partner",
+   "options": "Sales Partner"
+  },
+  {
+   "fieldname": "time",
+   "fieldtype": "Datetime",
+   "label": "Time"
+  },
+  {
+   "fieldname": "banner_id",
+   "fieldtype": "Link",
+   "label": "Banner Id",
+   "options": "Affiliate Banner and Text Link"
+  },
+  {
+   "fieldname": "remote_address",
+   "fieldtype": "Data",
+   "label": "Remote Address"
+  },
+  {
+   "fieldname": "keyword",
+   "fieldtype": "Link",
+   "label": "Keyword",
+   "options": "Affiliate Keyword"
+  },
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "label": "User",
+   "options": "User"
+  },
+  {
+   "fieldname": "first_visited",
+   "fieldtype": "Datetime",
+   "label": "First Visited"
+  },
+  {
+   "fieldname": "referrer",
+   "fieldtype": "Data",
+   "label": "Referrer"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-10-06 12:52:44.423195",
+ "modified_by": "Administrator",
+ "module": "Frappe Affiliate",
+ "name": "Affiliate Lead Log",
+ "naming_rule": "Autoincrement",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}
