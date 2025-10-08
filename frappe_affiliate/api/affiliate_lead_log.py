@@ -2,7 +2,7 @@ import frappe
 
 
 def record_lead(data, user):
-    affiliate = data["affiliate"]
+    affiliate = data.get("affiliate")
     if not affiliate:
         return
     lead_log = frappe.new_doc("Affiliate Lead Log")

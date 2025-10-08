@@ -12,6 +12,9 @@ def handle_affiliate_routes():
     cookie_route_path = affiliate_settings.affiliate_route_path
     banner_text_link_route_path = affiliate_settings.banner_and_text_link_route_path
 
+    if not (cookie_route_path or banner_text_link_route_path):
+        return
+
     if path.startswith(banner_text_link_route_path):
         check_banner_embed(banner_text_link_route_path)
     elif path.startswith(cookie_route_path):
