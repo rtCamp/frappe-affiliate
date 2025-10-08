@@ -86,12 +86,12 @@
   },
   {
    "fieldname": "coupons_count",
-   "fieldtype": "Data",
+   "fieldtype": "Int",
    "label": "Coupons Count"
   },
   {
    "fieldname": "code_length",
-   "fieldtype": "Data",
+   "fieldtype": "Int",
    "label": "Code Length"
   },
   {

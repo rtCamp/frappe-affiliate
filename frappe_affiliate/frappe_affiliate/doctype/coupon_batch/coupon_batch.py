@@ -47,12 +47,10 @@ class CouponBatch(Document):
 
     def generate_batch_coupons(self):
         prefix = self.prefix or ""
-        prefix_length = len(prefix)
-        generate_length = self.code_length - prefix_length
         for i in range(self.coupons_count):
             self.generate_coupon(
                 f"{self.coupon_name} {i+1}",
-                f"{prefix}{frappe.generate_hash()[:generate_length].upper()}",
+                f"{prefix}{frappe.generate_hash()[:self.code_length].upper()}",
             )
 
     def update_coupons(self):
