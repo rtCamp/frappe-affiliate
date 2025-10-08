@@ -110,6 +110,7 @@ def get_period_statistics(start_date, end_date):
             "void": 0,
         },
         fields="amount",
+        pluck="amount",
     )
     sales_count = len(sales)
     total_referral_fee = sum(sales)

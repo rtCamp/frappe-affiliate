@@ -58,10 +58,21 @@ def get_banners_and_text_links(name=None, type_filter=None, category_filter=None
                     if row.available_for_user_group not in ["", None]:
                         continue
 
+            banner_route_path = (
+                frappe.get_single_value(
+                    "Affiliate Settings", "banner_and_text_link_route_path"
+                )
+                or "/banner/"
+            )
+
             row_data = {
                 "name": row.name,
                 "type": row.type,
-                "banner": row.banner,
+                "banner": frappe.utils.get_url(
+                    frappe.db.get_value("File", row.banner, "file_url")
+                )
+                if row.banner
+                else "",
                 "redirect_url": row.redirect_url,
                 "title": row.title,
                 "description": row.description,
@@ -74,6 +85,13 @@ def get_banners_and_text_links(name=None, type_filter=None, category_filter=None
             if return_disabled:
                 row_data["available_for_user_group"] = row.available_for_user_group
                 row_data["open_in_new_window"] = row.open_in_new_window
+            else:
+                affiliate_username = frappe.db.get_value(
+                    "User", frappe.session.user, "username"
+                )
+                row_data["embed_url"] = frappe.utils.get_url(
+                    banner_route_path + f"{row.name}/{affiliate_username}"
+                )
 
             banners_text_links.append(row_data)
 
