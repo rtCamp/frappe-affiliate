@@ -20,7 +20,10 @@ def handle_affiliate_routes():
         return
 
 
-def set_cookie(cookie_route_path, cookie_timeout=30):
+def set_cookie(cookie_route_path, cookie_timeout):
+    if not cookie_timeout:
+        cookie_timeout = 30
+
     path = local.request.path
     parts = path[len(cookie_route_path) :].strip("/").split("/")
     parts_length = len(parts)
