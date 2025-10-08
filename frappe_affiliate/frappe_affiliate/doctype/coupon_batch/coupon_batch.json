@@ -1,0 +1,228 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "autoname": "autoincrement",
+ "creation": "2025-10-04 09:17:55.864685",
+ "doctype": "DocType",
+ "document_type": "Other",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "coupon_name",
+  "coupon_type",
+  "customer",
+  "sales_partner",
+  "column_break_4",
+  "coupon_code",
+  "pricing_rule",
+  "recurring_pricing_rule",
+  "batch_generation_section",
+  "coupons_count",
+  "code_length",
+  "prefix",
+  "uses",
+  "valid_from",
+  "valid_upto",
+  "maximum_use",
+  "used",
+  "apply_to_recurring",
+  "column_break_11",
+  "description",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "description": "e.g. \"Summer Holiday 2019 Offer 20\"",
+   "fieldname": "coupon_name",
+   "fieldtype": "Data",
+   "label": "Coupon Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "coupon_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Coupon Type",
+   "options": "Single\nBatch of Random Coupon Codes",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval: doc.coupon_type == \"Gift Card\"",
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "sales_partner",
+   "fieldtype": "Link",
+   "label": "Sales Partner",
+   "options": "Sales Partner"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval: !doc.from_external_ecomm_platform",
+   "fieldname": "pricing_rule",
+   "fieldtype": "Link",
+   "label": "Pricing Rule",
+   "mandatory_depends_on": "eval: !doc.from_external_ecomm_platform",
+   "options": "Pricing Rule"
+  },
+  {
+   "depends_on": "eval:doc.apply_to_recurring",
+   "fieldname": "recurring_pricing_rule",
+   "fieldtype": "Data",
+   "label": "Recurring Pricing Rule"
+  },
+  {
+   "depends_on": "eval:doc.coupon_type == \"Batch of Random Coupon Codes\"",
+   "fieldname": "batch_generation_section",
+   "fieldtype": "Section Break",
+   "label": "Batch Generation"
+  },
+  {
+   "fieldname": "coupons_count",
+   "fieldtype": "Data",
+   "label": "Coupons Count"
+  },
+  {
+   "fieldname": "code_length",
+   "fieldtype": "Data",
+   "label": "Code Length"
+  },
+  {
+   "fieldname": "prefix",
+   "fieldtype": "Data",
+   "label": "Prefix"
+  },
+  {
+   "fieldname": "uses",
+   "fieldtype": "Section Break",
+   "label": "Validity and Usage"
+  },
+  {
+   "fieldname": "valid_from",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Valid From"
+  },
+  {
+   "fieldname": "valid_upto",
+   "fieldtype": "Date",
+   "label": "Valid Up To"
+  },
+  {
+   "depends_on": "eval: doc.coupon_type == \"Promotional\"",
+   "fieldname": "maximum_use",
+   "fieldtype": "Int",
+   "label": "Maximum Use"
+  },
+  {
+   "default": "0",
+   "fieldname": "used",
+   "fieldtype": "Int",
+   "label": "Used",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "apply_to_recurring",
+   "fieldtype": "Check",
+   "label": "Apply To Recurring"
+  },
+  {
+   "fieldname": "column_break_11",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Text Editor",
+   "label": "Coupon Description"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Coupon Code",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "description": "unique e.g. SAVE20  To be used to get discount",
+   "fieldname": "coupon_code",
+   "fieldtype": "Data",
+   "label": "Coupon Code",
+   "no_copy": 1,
+   "unique": 1
+  }
+ ],
+ "links": [],
+ "modified": "2025-10-04 09:55:46.888125",
+ "modified_by": "Administrator",
+ "module": "Frappe Affiliate",
+ "name": "Coupon Batch",
+ "naming_rule": "Autoincrement",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts User",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Sales Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Website Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "coupon_name",
+ "track_changes": 1
+}

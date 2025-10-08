@@ -16,5 +16,4 @@ def after_install():
             {"doctype": "Sales Partner Type", "sales_partner_type": "Affiliate"}
         ).insert()
 
-    # nosemgrep
-    frappe.db.commit()
+    frappe.db.commit()  # nosemgrep
