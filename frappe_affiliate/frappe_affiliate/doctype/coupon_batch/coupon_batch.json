@@ -75,8 +75,10 @@
   {
    "depends_on": "eval:doc.apply_to_recurring",
    "fieldname": "recurring_pricing_rule",
-   "fieldtype": "Data",
-   "label": "Recurring Pricing Rule"
+   "fieldtype": "Link",
+   "label": "Recurring Pricing Rule",
+   "mandatory_depends_on": "eval:doc.apply_to_recurring",
+   "options": "Pricing Rule"
   },
   {
    "depends_on": "eval:doc.coupon_type == \"Batch of Random Coupon Codes\"",
@@ -133,7 +135,8 @@
    "default": "0",
    "fieldname": "apply_to_recurring",
    "fieldtype": "Check",
-   "label": "Apply To Recurring"
+   "label": "Apply To Recurring",
+   "mandatory_depends_on": "eval:doc.sales_partner != \"\" || doc.sales_partner != null"
   },
   {
    "fieldname": "column_break_11",
@@ -163,7 +166,7 @@
   }
  ],
  "links": [],
- "modified": "2025-10-04 09:55:46.888125",
+ "modified": "2025-10-08 23:02:00.283047",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Coupon Batch",
