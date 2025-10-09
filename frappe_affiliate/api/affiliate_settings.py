@@ -73,6 +73,7 @@ def get_banners_and_text_links(name=None, type_filter=None, category_filter=None
                 )
                 if row.banner
                 else "",
+                "banner_name": frappe.db.get_value("File", row.banner, "name"),
                 "redirect_url": row.redirect_url,
                 "title": row.title,
                 "description": row.description,
@@ -125,20 +126,16 @@ def get_banner_and_text_link_categories():
 @frappe.whitelist()
 def update_banner_and_text_link(banner_id, **kwargs):
     """Update a specific banner and text link row in the child table"""
-    try:
-        affiliate_settings = frappe.get_single("Affiliate Settings")
-        if hasattr(affiliate_settings, "banner_and_text_link"):
-            for row in affiliate_settings.banner_and_text_link:
-                if row.name == banner_id:
-                    for field, value in kwargs.items():
-                        if hasattr(row, field):
-                            setattr(row, field, value)
+    affiliate_settings = frappe.get_single("Affiliate Settings")
+    if hasattr(affiliate_settings, "banner_and_text_link"):
+        for row in affiliate_settings.banner_and_text_link:
+            if row.name == banner_id:
+                for field, value in kwargs.items():
+                    if hasattr(row, field):
+                        setattr(row, field, value)
 
-                    affiliate_settings.save()
-                    frappe.db.commit()
-                    return {"success": True, "message": "Banner updated successfully"}
+                affiliate_settings.save()
+                frappe.db.commit()
+                return {"success": True, "message": "Banner updated successfully"}
 
         return {"success": False, "message": "Banner not found"}
-    except Exception as e:
-        frappe.log_error(_(f"Error updating banner: {str(e)}"))
-        return {"success": False, "message": _(f"Error updating banner: {str(e)}")}
