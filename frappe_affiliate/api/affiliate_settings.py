@@ -1,5 +1,4 @@
 import frappe
-from frappe import _
 
 
 @frappe.whitelist()
@@ -123,7 +122,7 @@ def get_banner_and_text_link_categories():
     return categories
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
 def update_banner_and_text_link(banner_id, **kwargs):
     """Update a specific banner and text link row in the child table"""
     affiliate_settings = frappe.get_single("Affiliate Settings")
@@ -135,7 +134,6 @@ def update_banner_and_text_link(banner_id, **kwargs):
                         setattr(row, field, value)
 
                 affiliate_settings.save()
-                frappe.db.commit()
                 return {"success": True, "message": "Banner updated successfully"}
 
         return {"success": False, "message": "Banner not found"}

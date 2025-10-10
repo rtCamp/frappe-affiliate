@@ -45,7 +45,7 @@
   },
   {
    "fieldname": "user_agent",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "User Agent"
   },
   {
@@ -57,7 +57,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-06 12:52:28.628707",
+ "modified": "2025-10-10 01:57:42.504525",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Click Log",
