@@ -32,7 +32,7 @@ def record_referral(sales_invoice_doc, payment_entry_doc):
             "record_type": "commission",
             "tier": 0,
         }
-    ).save(ignore_permissions=True)
+    ).save()
 
     record_referral_tiers(referral, sales_invoice_doc, payment_entry_doc.name)
 
@@ -82,7 +82,7 @@ def record_referral_tiers(referral, invoice, payment_entry):
                 "record_type": "commission",
                 "tier": current_tier,
             }
-        ).save(ignore_permissions=True)
+        ).save()
 
         current_tier += 1
         sales_partner = parent_sales_partner
