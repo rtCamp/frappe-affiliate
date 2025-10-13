@@ -11,9 +11,9 @@ EXTRA_TEST_RECORD_DEPENDENCIES = []  # eg. ["User"]
 IGNORE_TEST_RECORD_DEPENDENCIES = []  # eg. ["User"]
 
 
-class IntegrationTestAffiliateCommissionRule(IntegrationTestCase):
+class IntegrationTestAffiliateReferralFeeRule(IntegrationTestCase):
     """
-    Integration tests for AffiliateCommissionRule.
+    Integration tests for AffiliateReferralFeeRule.
     Use this class for testing interactions between multiple components.
     """
 

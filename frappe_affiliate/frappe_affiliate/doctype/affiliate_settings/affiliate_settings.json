@@ -8,8 +8,8 @@
   "cookie_timeout",
   "minimum_payout",
   "delay_payout_days",
-  "first_commission_rate",
-  "subsequent_commission_rate",
+  "first_referral_rate",
+  "subsequent_referral_rate",
   "affiliate_route_path",
   "banner_and_text_link_route_path",
   "enable_keywords_support",
@@ -19,27 +19,20 @@
   {
    "fieldname": "cookie_timeout",
    "fieldtype": "Int",
-   "label": "Cookie Timeout"
-  },
-  {
-   "fieldname": "first_commission_rate",
-   "fieldtype": "Percent",
-   "label": "First commission rate"
-  },
-  {
-   "fieldname": "subsequent_commission_rate",
-   "fieldtype": "Percent",
-   "label": "Subsequent commission rate"
+   "label": "Cookie Timeout",
+   "non_negative": 1
   },
   {
    "fieldname": "minimum_payout",
    "fieldtype": "Int",
-   "label": "Minimum Payout"
+   "label": "Minimum Payout",
+   "non_negative": 1
   },
   {
    "fieldname": "delay_payout_days",
    "fieldtype": "Int",
-   "label": "Delay Payout (days)"
+   "label": "Delay Payout (days)",
+   "non_negative": 1
   },
   {
    "default": "0",
@@ -50,7 +43,9 @@
   {
    "fieldname": "affiliate_route_path",
    "fieldtype": "Data",
-   "label": "Affiliate Route Path"
+   "in_list_view": 1,
+   "label": "Affiliate Route Path",
+   "reqd": 1
   },
   {
    "fieldname": "banner_and_text_link",
@@ -61,14 +56,30 @@
   {
    "fieldname": "banner_and_text_link_route_path",
    "fieldtype": "Data",
-   "label": "Banner and Text Link Route Path"
+   "in_list_view": 1,
+   "label": "Banner and Text Link Route Path",
+   "reqd": 1
+  },
+  {
+   "fieldname": "first_referral_rate",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": "First Referral Rate",
+   "reqd": 1
+  },
+  {
+   "fieldname": "subsequent_referral_rate",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": "Subsequent Referral Rate",
+   "reqd": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-10-06 02:36:59.777452",
+ "modified": "2025-10-12 15:57:12.328250",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Settings",

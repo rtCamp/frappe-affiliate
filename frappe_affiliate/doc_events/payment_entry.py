@@ -1,6 +1,6 @@
 import frappe
 
-from frappe_affiliate.api.commission_rule import get_commission_rule_for_tier
+from frappe_affiliate.api.referral_fee_rule import get_referral_fee_rule_for_tier
 
 
 def on_submit(doc, method=None):
@@ -68,7 +68,7 @@ def record_referral_tiers(referral, invoice, payment_entry):
             current_tier += 1
             continue
 
-        tier_commission_rate = get_commission_rule_for_tier(
+        tier_referral_fee_rate = get_referral_fee_rule_for_tier(
             invoice, "Affiliate Tier {}".format(current_tier)
         )
 
@@ -77,7 +77,7 @@ def record_referral_tiers(referral, invoice, payment_entry):
                 "doctype": "Affiliate Referral",
                 "sales_partner": parent_sales_partner,
                 "payment_entry": payment_entry,
-                "amount": (referral.amount / 100) * tier_commission_rate,
+                "amount": (referral.amount / 100) * tier_referral_fee_rate,
                 "date": referral.date,
                 "record_type": "commission",
                 "tier": current_tier,

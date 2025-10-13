@@ -4,13 +4,13 @@ from frappe_affiliate.api.sales_invoice import get_invoice_count
 
 
 @frappe.whitelist()
-def get_commission_rules():
-    commission_rules_list = frappe.get_list(
-        "Affiliate Commission Rule",
+def get_referral_fee_rules():
+    referral_fee_rules_list = frappe.get_list(
+        "Affiliate Referral Fee Rule",
         fields=[
             "name",
-            "first_commission",
-            "subsequent_commission",
+            "first_referral_rate",
+            "subsequent_referral_rate",
             "disabled",
             "priority",
             "comment",
@@ -19,9 +19,9 @@ def get_commission_rules():
         order_by="priority asc",
     )
 
-    commission_rules = []
-    for commission_rule in commission_rules_list:
-        rule_doc = frappe.get_doc("Affiliate Commission Rule", commission_rule.name)
+    referral_fee_rules = []
+    for referral_fee_rule in referral_fee_rules_list:
+        rule_doc = frappe.get_doc("Affiliate Referral Fee Rule", referral_fee_rule.name)
         apply_on_items_code = [child.item_code for child in rule_doc.apply_on_item_code]
         apply_except_items_code = [
             child.item_code for child in rule_doc.apply_except_item_code
@@ -32,36 +32,36 @@ def get_commission_rules():
         apply_except_items = frappe.get_list(
             "Item", {"item_code": ["in", apply_except_items_code]}, pluck="item_name"
         )
-        commission_rules.append(
+        referral_fee_rules.append(
             {
-                "name": commission_rule.name,
-                "first_commission": commission_rule.first_commission,
-                "subsequent_commission": commission_rule.subsequent_commission,
-                "disabled": commission_rule.disabled,
-                "priority": commission_rule.priority,
+                "name": referral_fee_rule.name,
+                "first_referral_rate": referral_fee_rule.first_referral_rate,
+                "subsequent_referral_rate": referral_fee_rule.subsequent_referral_rate,
+                "disabled": referral_fee_rule.disabled,
+                "priority": referral_fee_rule.priority,
                 "apply_on_item_code": apply_on_items,
                 "apply_except_item_code": apply_except_items,
-                "comment": commission_rule.comment,
-                "apply_on_group": commission_rule.apply_on_group,
+                "comment": referral_fee_rule.comment,
+                "apply_on_group": referral_fee_rule.apply_on_group,
             }
         )
-    return commission_rules
+    return referral_fee_rules
 
 
-def get_commission_rule_for_tier(doc, group):
+def get_referral_fee_rule_for_tier(doc, group):
     invoice_item_codes = set(item.item_code for item in doc.items)
-    commission_rules = frappe.get_all(
-        "Affiliate Commission Rule",
+    referral_fee_rules = frappe.get_all(
+        "Affiliate Referral Fee Rule",
         filters={"disabled": 0, "apply_on_group": group},
         fields=["name"],
     )
 
-    commission_rule = None
+    referral_fee_rule = None
 
     invoice_count = get_invoice_count(doc)
 
-    for rule in commission_rules:
-        rule_doc = frappe.get_doc("Affiliate Commission Rule", rule.name)
+    for rule in referral_fee_rules:
+        rule_doc = frappe.get_doc("Affiliate Referral Fee Rule", rule.name)
         apply_on_rule_item_codes = set(
             child.item_code for child in rule_doc.apply_on_item_code
         )
@@ -72,18 +72,18 @@ def get_commission_rule_for_tier(doc, group):
             len(rule_doc.apply_on_item_code) == 0
             or invoice_item_codes.issubset(apply_on_rule_item_codes)
         ) and not invoice_item_codes.intersection(apply_except_rule_item_codes):
-            if commission_rule:
-                if rule_doc.priority < commission_rule.priority:
-                    commission_rule = rule_doc
+            if referral_fee_rule:
+                if rule_doc.priority < referral_fee_rule.priority:
+                    referral_fee_rule = rule_doc
             else:
-                commission_rule = rule_doc
-            commission_rule = rule_doc
+                referral_fee_rule = rule_doc
+            referral_fee_rule = rule_doc
 
-    commission_percent = None
-    if commission_rule:
+    referral_fee_rate = None
+    if referral_fee_rule:
         if invoice_count < 1:
-            commission_percent = commission_rule.get("first_commission", None)
+            referral_fee_rate = referral_fee_rule.get("first_referral_rate", None)
         else:
-            commission_percent = commission_rule.get("subsequent_commission", None)
+            referral_fee_rate = referral_fee_rule.get("subsequent_referral_rate", None)
 
-    return commission_percent
+    return referral_fee_rate

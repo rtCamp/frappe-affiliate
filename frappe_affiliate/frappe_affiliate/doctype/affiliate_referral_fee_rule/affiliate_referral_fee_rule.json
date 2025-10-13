@@ -1,16 +1,15 @@
 {
  "actions": [],
- "allow_rename": 1,
  "autoname": "autoincrement",
  "creation": "2025-08-26 10:50:01.631269",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "first_commission",
+  "first_referral_rate",
   "priority",
   "comment",
   "column_break_cdoo",
-  "subsequent_commission",
+  "subsequen_referral_rate",
   "apply_on_group",
   "disabled",
   "apply_on_section",
@@ -18,11 +17,6 @@
   "apply_except_item_code"
  ],
  "fields": [
-  {
-   "fieldname": "first_commission",
-   "fieldtype": "Percent",
-   "label": "First Commission"
-  },
   {
    "fieldname": "column_break_cdoo",
    "fieldtype": "Column Break"
@@ -39,14 +33,11 @@
    "label": "Disabled"
   },
   {
-   "fieldname": "subsequent_commission",
-   "fieldtype": "Percent",
-   "label": "Subsequent Commission"
-  },
-  {
    "fieldname": "priority",
    "fieldtype": "Int",
-   "label": "Priority"
+   "in_list_view": 1,
+   "label": "Priority",
+   "reqd": 1
   },
   {
    "fieldname": "comment",
@@ -63,22 +54,36 @@
    "fieldname": "apply_on_item_code",
    "fieldtype": "Table",
    "label": "Apply On Item Code",
-   "options": "Commission Rule Item Code"
+   "options": "Referral Rule Item Code"
   },
   {
    "fieldname": "apply_except_item_code",
    "fieldtype": "Table",
    "label": "Apply Except Item Code",
-   "options": "Commission Rule Item Code"
+   "options": "Referral Rule Item Code"
+  },
+  {
+   "fieldname": "first_referral_rate",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": "First Referral Rate",
+   "reqd": 1
+  },
+  {
+   "fieldname": "subsequen_referral_rate",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": "Subsequent Referral Rate",
+   "reqd": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-18 11:22:41.402803",
+ "modified": "2025-10-12 15:56:10.499474",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
- "name": "Affiliate Commission Rule",
+ "name": "Affiliate Referral Fee Rule",
  "naming_rule": "Autoincrement",
  "owner": "Administrator",
  "permissions": [
