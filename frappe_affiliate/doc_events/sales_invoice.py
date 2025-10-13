@@ -1,6 +1,6 @@
 import frappe
 
-from frappe_affiliate.api.sales_invoice import apply_commission_rules
+from frappe_affiliate.api.sales_invoice import apply_referral_fee_rules
 
 
 def validate(doc, method=None):
@@ -25,5 +25,5 @@ def validate(doc, method=None):
             doc.sales_partner = None
             doc.commission_rate = None
             return
-        doc.commission_rate = apply_commission_rules(doc)
+        doc.commission_rate = apply_referral_fee_rules(doc)
         doc.calculate_commission()

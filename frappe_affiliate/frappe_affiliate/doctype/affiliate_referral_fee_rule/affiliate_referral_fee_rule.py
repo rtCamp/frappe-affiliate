@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class CommissionRuleItemCode(Document):
+class AffiliateReferralFeeRule(Document):
     pass
