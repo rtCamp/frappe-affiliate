@@ -82,6 +82,7 @@ def apply_referral_fee_rules(doc):
                 referral_fee_rule.get("subsequent_referral_rate", None)
                 or frappe.get_single("Affiliate Settings").subsequent_referral_rate
             )
+        doc.custom_affiliate_referral_fee_rule = referral_fee_rule.name
 
     if not referral_fee_rate:
         referral_fee_rate = (
