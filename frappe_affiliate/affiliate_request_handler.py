@@ -128,13 +128,13 @@ def check_banner_embed(banner_text_link_route_path):
         return
     user = frappe.db.get_value("User", {"username": username, "enabled": 1}, "name")
     affiliate_exists = frappe.db.exists(
-        "Sales Partner", {"custom_user": user, "custom_banned": 0}
+        "Sales Partner", {"custom_user": user, "custom_banned": 0, "custom_disabled": 0}
     )
     if not affiliate_exists:
         return
     affiliate_link = frappe.db.get_value(
         "Sales Partner",
-        {"custom_user": user, "custom_banned": 0},
+        {"custom_user": user, "custom_banned": 0, "custom_disabled": 0},
         "custom_affiliate_link",
     )
 

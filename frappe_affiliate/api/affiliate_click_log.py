@@ -7,7 +7,9 @@ def record_click(username, banner=None):
         click_log = frappe.new_doc("Affiliate Click Log")
         user = frappe.db.get_value("User", {"username": username, "enabled": 1}, "name")
         sales_partner = frappe.db.get_value(
-            "Sales Partner", {"custom_user": user, "custom_banned": 0}, "name"
+            "Sales Partner",
+            {"custom_user": user, "custom_banned": 0, "custom_disabled": 0},
+            "name",
         )
         if not sales_partner:
             return
