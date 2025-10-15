@@ -15,32 +15,32 @@ def get_affiliate_keywords(
     date_from: str | None = None,
     date_to: str | None = None,
 ):
-    #     """
-    #     Get List of keywords with optional keyword and date filter with pagination.
+    """
+    Get List of keywords with optional keyword and date filter with pagination.
 
-    #     Args:
-    #         start: Starting index for pagination (default: 0)
-    #         page_length: Number of records per page (default: 20, max: 100)
-    #         keyword: Filter by keyword (optional)
-    #         date_from: Filter by start date (optional)
-    #         date_to: Filter by end date (optional)
+    Args:
+        start: Starting index for pagination (default: 0)
+        page_length: Number of records per page (default: 20, max: 100)
+        keyword: Filter by keyword (optional)
+        date_from: Filter by start date (optional)
+        date_to: Filter by end date (optional)
 
-    #     Response:
-    #     {
-    #         "message": [
-    #             {
-    #                 "keyword_name": string,
-    #                 "keyword": string,
-    #                 "clicks": number,
-    #                 "unique_clicks": number,
-    #                 "leads": number,
-    #                 "sales": number,
-    #                 "total_referral_fee": float
-    #             }
-    #         ],
-    #         "total_count": number
-    #     }
-    #     """
+    Response:
+    {
+        "message": [
+            {
+                "keyword_name": string,
+                "keyword": string,
+                "clicks": number,
+                "unique_clicks": number,
+                "leads": number,
+                "sales": number,
+                "total_referral_fee": float
+            }
+        ],
+        "total_count": number
+    }
+    """
     date_from = get_datetime(date_from)
     date_to = get_datetime(date_to)
 
