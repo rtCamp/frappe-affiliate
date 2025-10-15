@@ -51,13 +51,16 @@ def record_referral_tiers(referral, invoice, payment_entry):
         if not parent_sales_partner:
             return
         parent_banned = frappe.db.get_value(
-            "Sales Partner", parent_sales_partner, "custom_banned"
+            "Sales Partner",
+            parent_sales_partner,
+            ["custom_banned", "custom_disabled"],
+            as_dict=True,
         )
         sales_partner_user = frappe.db.get_value(
             "Sales Partner", parent_sales_partner, "custom_user"
         )
-        if parent_banned:
-            break
+        if parent_banned.custom_disabled == 1 or parent_banned.custom_banned == 1:
+            continue
 
         affiliate_user_group = frappe.get_all(
             "User Group Member", filters={"user": sales_partner_user}, pluck="parent"
