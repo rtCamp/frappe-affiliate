@@ -24,7 +24,7 @@
   "valid_from",
   "valid_upto",
   "maximum_use",
-  "used",
+  "maximum_user_use_count",
   "apply_to_recurring",
   "column_break_11",
   "description",
@@ -36,8 +36,7 @@
    "fieldname": "coupon_name",
    "fieldtype": "Data",
    "label": "Coupon Name",
-   "reqd": 1,
-   "unique": 1
+   "reqd": 1
   },
   {
    "fieldname": "coupon_type",
@@ -118,18 +117,9 @@
    "label": "Valid Up To"
   },
   {
-   "depends_on": "eval: doc.coupon_type == \"Promotional\"",
    "fieldname": "maximum_use",
    "fieldtype": "Int",
    "label": "Maximum Use"
-  },
-  {
-   "default": "0",
-   "fieldname": "used",
-   "fieldtype": "Int",
-   "label": "Used",
-   "no_copy": 1,
-   "read_only": 1
   },
   {
    "default": "0",
@@ -163,10 +153,15 @@
    "label": "Coupon Code",
    "no_copy": 1,
    "unique": 1
+  },
+  {
+   "fieldname": "maximum_user_use_count",
+   "fieldtype": "Int",
+   "label": "Maximum User Use Count"
   }
  ],
  "links": [],
- "modified": "2025-10-08 23:02:00.283047",
+ "modified": "2025-10-16 23:01:58.008702",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Coupon Batch",
