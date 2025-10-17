@@ -7,14 +7,16 @@ from frappe.model.document import Document
 
 class CouponBatch(Document):
     def validate(self):
-        if self.coupon_type == "Single" and not self.coupon_code:
-            self.coupon_code = frappe.generate_hash()[:10].upper()
+        if not frappe.flags.in_migration:
+            if self.coupon_type == "Single" and not self.coupon_code:
+                self.coupon_code = frappe.generate_hash()[:10].upper()
 
     def on_update(self):
-        if frappe.db.exists("Coupon Code", {"custom_coupon_batch": self.name}):
-            self.update_coupons()
-        else:
-            self.generate_coupons()
+        if not frappe.flags.in_migration:
+            if frappe.db.exists("Coupon Code", {"custom_coupon_batch": self.name}):
+                self.update_coupons()
+            else:
+                self.generate_coupons()
 
     def generate_coupons(self):
         coupon_type = self.coupon_type
