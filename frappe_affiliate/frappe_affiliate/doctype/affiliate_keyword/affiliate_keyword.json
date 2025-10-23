@@ -18,14 +18,14 @@
   },
   {
    "fieldname": "keyword",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Keyword"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-17 03:18:57.074209",
+ "modified": "2025-10-22 13:17:53.194955",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Keyword",
