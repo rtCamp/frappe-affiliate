@@ -12,6 +12,7 @@
   "subsequent_referral_rate",
   "affiliate_route_path",
   "banner_and_text_link_route_path",
+  "affiliate_redirect_url",
   "enable_keywords_support",
   "banner_and_text_link"
  ],
@@ -73,13 +74,20 @@
    "in_list_view": 1,
    "label": "Subsequent Referral Rate",
    "reqd": 1
+  },
+  {
+   "fieldname": "affiliate_redirect_url",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Affiliate Redirect URL",
+   "reqd": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-10-12 15:57:12.328250",
+ "modified": "2025-10-23 21:44:10.978581",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Settings",
