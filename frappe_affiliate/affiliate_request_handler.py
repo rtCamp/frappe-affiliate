@@ -41,7 +41,10 @@ def set_cookie(cookie_route_path, cookie_timeout):
     banner_exists = frappe.db.exists(
         "Affiliate Banner and Text Link", {"name": banner, "disabled": 0}
     )
-    banner_url = "/"
+    affiliate_redirect_url = frappe.get_cached_doc(
+        "Affiliate Settings"
+    ).affiliate_redirect_url
+    banner_url = affiliate_redirect_url if affiliate_redirect_url else "/"
     if banner_exists:
         banner_url = get_banner_redirect_url(banner)
     cookie_val = local.request.cookies.get("affiliate_id")
