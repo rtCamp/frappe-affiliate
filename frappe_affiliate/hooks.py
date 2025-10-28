@@ -151,6 +151,9 @@ doc_events = {
     "Affiliate Referral": {
         "on_update": ["frappe_affiliate.doc_events.affiliate_referral.on_update"],
     },
+    "Subscription": {
+        "validate": ["frappe_affiliate.doc_events.subscription.validate"],
+    },
 }
 # Scheduled Tasks
 # ---------------
