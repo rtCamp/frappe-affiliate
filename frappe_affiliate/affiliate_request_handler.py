@@ -36,15 +36,32 @@ def set_cookie(cookie_route_path, cookie_timeout):
 
     username = parts[0]
 
-    response = Response("", content_type="text/html")
-    banner = frappe.local.request.args.get("banner")
-    banner_exists = frappe.db.exists(
-        "Affiliate Banner and Text Link", {"name": banner, "disabled": 0}
-    )
+    if not username:
+        return
+
     affiliate_redirect_url = frappe.get_cached_doc(
         "Affiliate Settings"
     ).affiliate_redirect_url
     banner_url = affiliate_redirect_url if affiliate_redirect_url else "/"
+
+    response = Response("", content_type="text/html")
+
+    user_exists = frappe.db.exists("User", {"username": username, "enabled": 1})
+    if not user_exists:
+        redirect_affiliate_link(banner_url, response)
+
+    affiliate_exists = frappe.db.exists(
+        "Sales Partner",
+        {"custom_user": user_exists, "custom_banned": 0, "custom_disabled": 0},
+    )
+
+    if not affiliate_exists:
+        redirect_affiliate_link(banner_url, response)
+
+    banner = frappe.local.request.args.get("banner")
+    banner_exists = frappe.db.exists(
+        "Affiliate Banner and Text Link", {"name": banner, "disabled": 0}
+    )
     if banner_exists:
         banner_url = get_banner_redirect_url(banner)
     cookie_val = local.request.cookies.get("affiliate_id")
@@ -84,9 +101,7 @@ def set_cookie(cookie_route_path, cookie_timeout):
             "affiliate_id", new_val, max_age=60 * 60 * 24 * cookie_timeout
         )
 
-    response.headers["Location"] = banner_url
-    response.status_code = 302
-    raise HTTPException(response=response)
+    redirect_affiliate_link(banner_url, response)
 
 
 def get_banner_redirect_url(banner):
@@ -162,3 +177,9 @@ def check_banner_embed(banner_text_link_route_path):
         """
 
     raise HTTPException(response=Response(js, content_type="application/javascript"))
+
+
+def redirect_affiliate_link(redirect_url, response):
+    response.headers["Location"] = redirect_url
+    response.status_code = 302
+    raise HTTPException(response=response)
