@@ -41,8 +41,10 @@ def get_affiliate_keywords(
         "total_count": number
     }
     """
-    date_from = get_datetime(date_from)
-    date_to = get_datetime(date_to)
+    if date_from:
+        date_from = get_datetime(date_from)
+    if date_to:
+        date_to = get_datetime(date_to)
 
     sales_partner = frappe.db.get_value(
         "Sales Partner", {"custom_user": frappe.session.user}, "name"
