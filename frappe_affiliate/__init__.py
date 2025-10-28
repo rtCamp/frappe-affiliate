@@ -3,7 +3,10 @@ __version__ = "0.0.1"
 import json
 
 import frappe
-from erpnext.accounts.doctype.pricing_rule import pricing_rule  # nosemgrep
+from erpnext.accounts.doctype.pricing_rule import (  # nosemgrep
+    pricing_rule,  # nosemgrep
+    utils,  # nosemgrep
+)
 from erpnext.accounts.doctype.pricing_rule.pricing_rule import (
     apply_price_discount_rule,
     get_pricing_rule_details,
@@ -11,10 +14,13 @@ from erpnext.accounts.doctype.pricing_rule.pricing_rule import (
     update_args_for_pricing_rule,
     update_pricing_rule_uom,
 )
+from frappe import _
+from frappe.utils import getdate, today
 
 
 def monkey_patch():
     pricing_rule.get_pricing_rule_for_item = get_pricing_rule_for_item  # nosemgrep
+    utils.validate_coupon_code = validate_coupon_code  # nosemgrep
 
 
 def get_pricing_rule_for_item(args, doc=None, for_validate=False):
@@ -163,6 +169,22 @@ def get_pricing_rule_for_item(args, doc=None, for_validate=False):
         )
 
     return item_details
+
+
+def validate_coupon_code(coupon_name):
+    coupon = frappe.get_doc("Coupon Code", coupon_name)
+    if coupon.valid_from and coupon.valid_from > getdate(today()):
+        frappe.throw(_("Sorry, this coupon code's validity has not started"))
+    elif coupon.valid_upto and coupon.valid_upto < getdate(today()):
+        frappe.throw(_("Sorry, this coupon code's validity has expired"))
+    elif coupon.maximum_use and coupon.used >= coupon.maximum_use:
+        frappe.throw(_("Sorry, this coupon code is no longer valid"))
+    elif (
+        coupon.custom_subscription_maximum_use
+        and coupon.custom_subscription_used_count
+        >= coupon.custom_subscription_maximum_use
+    ):
+        frappe.throw(_("Sorry, this coupon code is no longer valid"))
 
 
 try:

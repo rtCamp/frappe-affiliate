@@ -25,6 +25,7 @@
   "valid_upto",
   "maximum_use",
   "maximum_user_use_count",
+  "subscription_maximum_use",
   "apply_to_recurring",
   "column_break_11",
   "description",
@@ -119,7 +120,8 @@
   {
    "fieldname": "maximum_use",
    "fieldtype": "Int",
-   "label": "Maximum Use"
+   "label": "Maximum Use",
+   "non_negative": 1
   },
   {
    "default": "0",
@@ -157,11 +159,18 @@
   {
    "fieldname": "maximum_user_use_count",
    "fieldtype": "Int",
-   "label": "Maximum User Use Count"
+   "label": "Maximum User Use Count",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "subscription_maximum_use",
+   "fieldtype": "Int",
+   "label": "Subscription Maximum Use",
+   "non_negative": 1
   }
  ],
  "links": [],
- "modified": "2025-10-16 23:01:58.008702",
+ "modified": "2025-10-28 11:15:03.945800",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Coupon Batch",

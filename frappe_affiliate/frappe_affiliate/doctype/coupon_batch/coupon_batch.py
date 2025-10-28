@@ -43,6 +43,8 @@ class CouponBatch(Document):
                 "valid_upto": self.valid_upto,
                 "maximum_use": self.maximum_use,
                 "custom_coupon_batch": self.name,
+                "custom_subscription_maximum_use": self.subscription_maximum_use,
+                "custom_maximum_user_use_count": self.maximum_user_use_count,
             }
         )
         coupon.save()
@@ -66,6 +68,7 @@ class CouponBatch(Document):
             coupon.custom_sales_partner = self.sales_partner
             coupon.custom_pricing_rule = self.pricing_rule
             coupon.custom_recurring_pricing_rule = self.recurring_pricing_rule
+            coupon.custom_subscription_maximum_use = self.subscription_maximum_use
             coupon.valid_from = self.valid_from
             coupon.valid_upto = self.valid_upto
             coupon.maximum_use = self.maximum_use
