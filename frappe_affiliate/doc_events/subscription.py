@@ -15,6 +15,10 @@ def validate(doc, method=None):
         if not coupon_code_valid:
             frappe.throw(translate("Invalid coupon code"))
 
+        if coupon_code_doc.customer:
+            if coupon_code_doc.customer != doc.party:
+                frappe.throw(translate("This coupon code is not valid for this user"))
+
         coupon_user_use_count = coupon_code_doc.get("custom_maximum_user_use_count", 0)
         if coupon_user_use_count > 0:
             user_use_count = frappe.db.count(
@@ -22,7 +26,7 @@ def validate(doc, method=None):
                 {
                     "party_type": "Customer",
                     "party": doc.party,
-                    "coupon_code": doc.custom_coupon_code,
+                    "custom_coupon_code": doc.custom_coupon_code,
                 },
             )
             if user_use_count >= coupon_user_use_count:
