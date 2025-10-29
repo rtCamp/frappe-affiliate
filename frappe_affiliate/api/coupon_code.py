@@ -1,4 +1,5 @@
 import frappe
+from frappe.utils import getdate, nowdate
 
 
 @frappe.whitelist()
@@ -21,19 +22,44 @@ def validate_coupon_code(coupon_code):
         return {"valid": False, "message": "No coupon code provided"}
 
     coupon = frappe.get_doc("Coupon Code", coupon_code)
-    if coupon.disabled:
-        return {"valid": False, "message": "This coupon code is no longer valid"}
 
-    if coupon.valid_upto and coupon.valid_upto < frappe.utils.nowdate():
+    if coupon.valid_from and getdate(coupon.valid_from) > getdate(nowdate()):
+        return {
+            "valid": False,
+            "message": "This coupon code's validity has not started",
+        }
+
+    if coupon.valid_upto and getdate(coupon.valid_upto) < getdate(nowdate()):
         return {"valid": False, "message": "This coupon code has expired"}
+
+    if coupon.maximum_use and coupon.used >= coupon.maximum_use:
+        return {
+            "valid": False,
+            "message": "This coupon code has reached its maximum usage limit",
+        }
+
+    if (
+        coupon.custom_subscription_maximum_use
+        and coupon.custom_subscription_used_count
+        >= coupon.custom_subscription_maximum_use
+    ):
+        return {
+            "valid": False,
+            "message": "This coupon code has reached its maximum usage limit",
+        }
 
     affiliate = False
     if coupon.custom_sales_partner:
-        sales_partner = frappe.db.get_value(
-            "Sales Partner", {"name": coupon.custom_sales_partner}, "name"
+        affiliate_banned = frappe.db.get_value(
+            "Sales Partner",
+            coupon.custom_sales_partner,
+            ["custom_banned", "custom_disabled"],
+            as_dict=True,
         )
-        if sales_partner:
-            affiliate = True
+        if affiliate_banned.custom_disabled or affiliate_banned.custom_banned:
+            return {"valid": False, "message": "This coupon code is no longer valid"}
+
+        affiliate = True
 
     return {
         "valid": True,
