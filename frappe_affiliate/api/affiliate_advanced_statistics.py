@@ -433,14 +433,14 @@ def get_period_statistics(start_date, end_date, user=None):
         "Affiliate Click Log",
         filters={
             "sales_partner": sales_partner,
-            "creation": ["between", [start_datetime, end_datetime]],
+            "time": ["between", [start_datetime, end_datetime]],
         },
     )
     unique_clicks_count = frappe.get_all(
         "Affiliate Click Log",
         filters={
             "sales_partner": sales_partner,
-            "creation": ["between", [start_datetime, end_datetime]],
+            "time": ["between", [start_datetime, end_datetime]],
         },
         fields=["remote_address"],
         group_by="remote_address",
