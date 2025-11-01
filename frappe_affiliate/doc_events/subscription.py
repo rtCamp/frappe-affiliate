@@ -1,6 +1,5 @@
 import frappe
 from frappe import _ as translate
-
 from frappe_affiliate.utils.coupon_code import (
     update_coupon_code_count,
     validate_coupon_code,
@@ -8,6 +7,7 @@ from frappe_affiliate.utils.coupon_code import (
 
 
 def validate(doc, method=None):
+    return
     if doc.custom_coupon_code:
         coupon_code_doc = frappe.get_doc("Coupon Code", doc.custom_coupon_code)
         coupon_code_valid = validate_coupon_code(coupon_code_doc)
