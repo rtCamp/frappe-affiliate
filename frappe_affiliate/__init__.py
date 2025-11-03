@@ -172,7 +172,9 @@ def get_pricing_rule_for_item(args, doc=None, for_validate=False):
 
 
 def validate_coupon_code(coupon_name):
-    return
+    if frappe.flags.in_migrate:
+        return
+
     coupon = frappe.get_doc("Coupon Code", coupon_name)
     if coupon.valid_from and coupon.valid_from > getdate(today()):
         frappe.throw(_("Sorry, this coupon code's validity has not started"))

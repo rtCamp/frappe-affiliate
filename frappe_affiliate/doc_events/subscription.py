@@ -7,7 +7,9 @@ from frappe_affiliate.utils.coupon_code import (
 
 
 def validate(doc, method=None):
-    return
+    if frappe.flags.in_migrate:
+        return
+
     if doc.custom_coupon_code:
         coupon_code_doc = frappe.get_doc("Coupon Code", doc.custom_coupon_code)
         coupon_code_valid = validate_coupon_code(coupon_code_doc)
