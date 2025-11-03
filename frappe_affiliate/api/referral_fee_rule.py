@@ -4,7 +4,7 @@ from frappe_affiliate.api.sales_invoice import get_invoice_count
 
 
 @frappe.whitelist()
-def get_referral_fee_rules():
+def get_referral_fee_rules(limit=20, offset=0, order_by="priority asc"):
     referral_fee_rules_list = frappe.get_list(
         "Affiliate Referral Fee Rule",
         fields=[
@@ -16,9 +16,12 @@ def get_referral_fee_rules():
             "comment",
             "apply_on_group",
         ],
-        order_by="priority asc",
+        order_by=order_by,
+        limit_page_length=limit,
+        limit_start=offset,
     )
 
+    result = {}
     referral_fee_rules = []
     for referral_fee_rule in referral_fee_rules_list:
         rule_doc = frappe.get_doc("Affiliate Referral Fee Rule", referral_fee_rule.name)
@@ -45,7 +48,9 @@ def get_referral_fee_rules():
                 "apply_on_group": referral_fee_rule.apply_on_group,
             }
         )
-    return referral_fee_rules
+    result["total"] = frappe.db.count("Affiliate Referral Fee Rule")
+    result["rules"] = referral_fee_rules
+    return result
 
 
 def get_referral_fee_rule_for_tier(doc, group):
