@@ -4,9 +4,9 @@ import json
 
 import frappe
 from erpnext.accounts.doctype.pricing_rule import (  # nosemgrep
-    pricing_rule,  # nosemgrep
-    utils,  # nosemgrep
+    pricing_rule as pricing_rule,  # nosemgrep
 )
+from erpnext.accounts.doctype.pricing_rule import utils as utils  # nosemgrep
 from erpnext.accounts.doctype.pricing_rule.pricing_rule import (
     apply_price_discount_rule,
     get_pricing_rule_details,
@@ -16,6 +16,8 @@ from erpnext.accounts.doctype.pricing_rule.pricing_rule import (
 )
 from frappe import _
 from frappe.utils import getdate, today
+
+from frappe_affiliate.api.sales_invoice import get_invoice_count
 
 
 def monkey_patch():
@@ -70,6 +72,31 @@ def get_pricing_rule_for_item(args, doc=None, for_validate=False):
         else get_pricing_rules(args, doc)
     )
 
+    if args.get("coupon_code", None):
+        coupon_fieldname = "pricing_rule"
+        if doc.doctype == "Sales Invoice" and not args.get("is_return"):
+            coupon_values = frappe.db.get_value(
+                doctype="Coupon Code",
+                filters={"name": args.get("coupon_code")},
+                fieldname=[
+                    "custom_apply_to_recurring",
+                    "pricing_rule",
+                    "custom_recurring_pricing_rule",
+                ],
+                as_dict=True,
+            )
+
+            invoice_count = get_invoice_count(doc)
+            if invoice_count >= 1 and coupon_values.get("custom_apply_to_recurring"):
+                coupon_fieldname = "custom_recurring_pricing_rule"
+            elif invoice_count >= 1 and not coupon_values.get(
+                "custom_apply_to_recurring"
+            ):
+                coupon_fieldname = None
+        if coupon_fieldname:
+            pricing_rule_name = coupon_values.get(coupon_fieldname)
+            pricing_rules.append(pricing_rule_name)
+
     if pricing_rules:
         rules = []
 
@@ -97,7 +124,6 @@ def get_pricing_rule_for_item(args, doc=None, for_validate=False):
                         filters={"name": args.coupon_code},
                         fieldname="custom_apply_to_recurring",
                     )
-                    from frappe_affiliate.api.sales_invoice import get_invoice_count
 
                     invoice_count = get_invoice_count(doc)
                     if invoice_count >= 1 and recurring_coupon:
