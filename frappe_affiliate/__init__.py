@@ -3,9 +3,6 @@ __version__ = "0.0.1"
 import json
 
 import frappe
-from apps.erpnext.erpnext.accounts.doctype.pricing_rule.utils import (
-    get_other_conditions,
-)
 from erpnext.accounts.doctype.pricing_rule import (  # nosemgrep
     pricing_rule as pricing_rule,  # nosemgrep
 )
@@ -17,7 +14,10 @@ from erpnext.accounts.doctype.pricing_rule.pricing_rule import (
     update_args_for_pricing_rule,
     update_pricing_rule_uom,
 )
-from erpnext.accounts.doctype.pricing_rule.utils import _get_tree_conditions
+from erpnext.accounts.doctype.pricing_rule.utils import (
+    _get_tree_conditions,
+    get_other_conditions,
+)
 from frappe import _
 from frappe.utils import getdate, today
 
