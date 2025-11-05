@@ -3,6 +3,9 @@ __version__ = "0.0.1"
 import json
 
 import frappe
+from apps.erpnext.erpnext.accounts.doctype.pricing_rule.utils import (
+    get_other_conditions,
+)
 from erpnext.accounts.doctype.pricing_rule import (  # nosemgrep
     pricing_rule as pricing_rule,  # nosemgrep
 )
@@ -14,6 +17,7 @@ from erpnext.accounts.doctype.pricing_rule.pricing_rule import (
     update_args_for_pricing_rule,
     update_pricing_rule_uom,
 )
+from erpnext.accounts.doctype.pricing_rule.utils import _get_tree_conditions
 from frappe import _
 from frappe.utils import getdate, today
 
@@ -23,6 +27,7 @@ from frappe_affiliate.api.sales_invoice import get_invoice_count
 def monkey_patch():
     pricing_rule.get_pricing_rule_for_item = get_pricing_rule_for_item  # nosemgrep
     utils.validate_coupon_code = validate_coupon_code  # nosemgrep
+    utils._get_pricing_rules = _get_pricing_rules  # nosemgrep
 
 
 def get_pricing_rule_for_item(args, doc=None, for_validate=False):
@@ -196,6 +201,83 @@ def validate_coupon_code(coupon_name):
         >= coupon.custom_subscription_maximum_use
     ):
         frappe.throw(_("Sorry, this coupon code is no longer valid"))
+
+
+def _get_pricing_rules(apply_on, args, values):
+    apply_on_field = frappe.scrub(apply_on)
+
+    if not args.get(apply_on_field):
+        return []
+
+    child_doc = f"`tabPricing Rule {apply_on}`"
+
+    conditions = item_variant_condition = item_conditions = ""
+    values[apply_on_field] = args.get(apply_on_field)
+    if apply_on_field in ["item_code", "brand"]:
+        item_conditions = f"{child_doc}.{apply_on_field}= %({apply_on_field})s"
+
+        if apply_on_field == "item_code":
+            if args.get("uom", None):
+                item_conditions += " and ({child_doc}.uom={item_uom} or IFNULL({child_doc}.uom, '')='')".format(
+                    child_doc=child_doc, item_uom=frappe.db.escape(args.get("uom"))
+                )
+            if "variant_of" not in args:
+                args.variant_of = frappe.get_cached_value(
+                    "Item", args.item_code, "variant_of"
+                )
+
+            if args.variant_of:
+                item_variant_condition = f" or {child_doc}.item_code=%(variant_of)s "
+                values["variant_of"] = args.variant_of
+    elif apply_on_field == "item_group":
+        item_conditions = _get_tree_conditions(args, "Item Group", child_doc, False)
+        if args.get("uom", None):
+            item_conditions += " and ({child_doc}.uom={item_uom} or IFNULL({child_doc}.uom, '')='')".format(
+                child_doc=child_doc, item_uom=frappe.db.escape(args.get("uom"))
+            )
+
+    conditions += get_other_conditions(conditions, values, args)
+    warehouse_conditions = _get_tree_conditions(args, "Warehouse", "`tabPricing Rule`")
+    if warehouse_conditions:
+        warehouse_conditions = f" and {warehouse_conditions}"
+
+    if not args.price_list:
+        args.price_list = None
+
+    conditions += (
+        " and ifnull(`tabPricing Rule`.for_price_list, '') in (%(price_list)s, '')"
+    )
+    values["price_list"] = args.get("price_list")
+
+    pricing_rules = (
+        frappe.db.sql(
+            """select `tabPricing Rule`.*,
+			{child_doc}.{apply_on_field}, {child_doc}.uom
+		from `tabPricing Rule`, {child_doc}
+		where ({item_conditions} or (`tabPricing Rule`.apply_rule_on_other is not null
+			and `tabPricing Rule`.{apply_on_other_field}=%({apply_on_field})s) {item_variant_condition})
+			and {child_doc}.parent = `tabPricing Rule`.name
+			and `tabPricing Rule`.disable = 0 and
+			`tabPricing Rule`.{transaction_type} = 1 {warehouse_cond} {conditions}
+			and `tabPricing Rule`.coupon_code_based = 0
+		order by `tabPricing Rule`.priority desc,
+			`tabPricing Rule`.name desc""".format(
+                child_doc=child_doc,
+                apply_on_field=apply_on_field,
+                item_conditions=item_conditions,
+                item_variant_condition=item_variant_condition,
+                transaction_type=args.transaction_type,
+                warehouse_cond=warehouse_conditions,
+                apply_on_other_field=f"other_{apply_on_field}",
+                conditions=conditions,
+            ),
+            values,
+            as_dict=1,
+        )
+        or []
+    )
+
+    return pricing_rules
 
 
 try:
