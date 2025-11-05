@@ -4,6 +4,8 @@ from frappe_affiliate.api.referral_fee_rule import get_referral_fee_rule_for_tie
 
 
 def on_submit(doc, method=None):
+    if frappe.flags.in_migrate:
+        return
     payment_references = doc.get("references", [])
     sales_invoice = (
         payment_references[0].get("reference_name") if payment_references else None
