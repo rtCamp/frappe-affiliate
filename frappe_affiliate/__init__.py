@@ -72,6 +72,7 @@ def get_pricing_rule_for_item(args, doc=None, for_validate=False):
         else get_pricing_rules(args, doc)
     )
 
+    coupon_pricing_rule = None
     if args.get("coupon_code", None):
         coupon_fieldname = "pricing_rule"
         if doc.doctype == "Sales Invoice" and not args.get("is_return"):
@@ -94,8 +95,9 @@ def get_pricing_rule_for_item(args, doc=None, for_validate=False):
             ):
                 coupon_fieldname = None
         if coupon_fieldname:
-            pricing_rule_name = coupon_values.get(coupon_fieldname)
-            pricing_rules.append(pricing_rule_name)
+            coupon_pricing_rule = coupon_values.get(coupon_fieldname)
+            if not (for_validate and args.get("pricing_rules")):
+                pricing_rules.append(coupon_pricing_rule)
 
     if pricing_rules:
         rules = []
@@ -116,26 +118,6 @@ def get_pricing_rule_for_item(args, doc=None, for_validate=False):
             if pricing_rule.coupon_code_based == 1:
                 if not args.coupon_code:
                     continue
-
-                coupon_fieldname = "pricing_rule"
-                if doc.doctype == "Sales Invoice" and not args.get("is_return"):
-                    recurring_coupon = frappe.db.get_value(
-                        doctype="Coupon Code",
-                        filters={"name": args.coupon_code},
-                        fieldname="custom_apply_to_recurring",
-                    )
-
-                    invoice_count = get_invoice_count(doc)
-                    if invoice_count >= 1 and recurring_coupon:
-                        coupon_fieldname = "custom_recurring_pricing_rule"
-                    elif invoice_count >= 1 and not recurring_coupon:
-                        continue
-
-                coupon_pricing_rule = frappe.db.get_value(
-                    doctype="Coupon Code",
-                    filters={"name": args.coupon_code},
-                    fieldname=coupon_fieldname,
-                )
 
                 if pricing_rule.name != coupon_pricing_rule:
                     continue
@@ -218,5 +200,6 @@ def validate_coupon_code(coupon_name):
 
 try:
     monkey_patch()
-except Exception:
-    pass
+except Exception as e:
+    frappe.log_error(message=str(e), title="Frappe Affiliate Monkey Patch Failed")
+    raise frappe.ValidationError("Frappe Affiliate Monkey Patch Failed: ", str(e))
