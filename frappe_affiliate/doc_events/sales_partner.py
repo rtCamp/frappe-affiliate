@@ -2,6 +2,8 @@ import frappe
 
 
 def before_insert(doc, method=None):
+    if frappe.flags.in_migrate:
+        return
     if not doc.partner_type == "Affiliate":
         return
     if doc.custom_user:
@@ -13,6 +15,8 @@ def before_insert(doc, method=None):
 
 
 def after_insert(doc, method=None):
+    if frappe.flags.in_migrate:
+        return
     if not doc.partner_type == "Affiliate":
         return
     supplier = frappe.get_doc(
