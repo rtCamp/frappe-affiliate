@@ -131,6 +131,7 @@ after_install = "frappe_affiliate.install.after_install"
 
 override_doctype_class = {
     "Subscription": "frappe_affiliate.override.subscription_override.SubscriptionOverride",
+    "Pricing Rule": "frappe_affiliate.override.pricing_rule_override.PricingRuleOverride",
 }
 
 # Document Events
