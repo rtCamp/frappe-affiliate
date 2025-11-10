@@ -46,9 +46,9 @@
   },
   {
    "fieldname": "apply_on_group",
-   "fieldtype": "Link",
+   "fieldtype": "Table",
    "label": "Apply on Group",
-   "options": "User Group"
+   "options": "Referral User Group"
   },
   {
    "fieldname": "apply_on_item_code",
@@ -80,7 +80,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-13 00:26:10.908351",
+ "modified": "2025-11-10 12:14:49.978060",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Referral Fee Rule",

@@ -1,0 +1,34 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-11-10 11:41:04.287966",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "user_group"
+ ],
+ "fields": [
+  {
+   "fieldname": "user_group",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "User Group",
+   "options": "User Group",
+   "reqd": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-11-10 12:15:19.679330",
+ "modified_by": "Administrator",
+ "module": "Frappe Affiliate",
+ "name": "Referral User Group",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

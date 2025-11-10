@@ -35,6 +35,10 @@ def get_referral_fee_rules(limit=20, offset=0, order_by="priority asc"):
         apply_except_items = frappe.get_list(
             "Item", {"item_code": ["in", apply_except_items_code]}, pluck="item_name"
         )
+        apply_on_group = [
+            referral_group.user_group for referral_group in rule_doc.apply_on_group
+        ]
+        apply_on_group_string = ", ".join(apply_on_group) if apply_on_group else ""
         referral_fee_rules.append(
             {
                 "name": referral_fee_rule.name,
@@ -45,7 +49,7 @@ def get_referral_fee_rules(limit=20, offset=0, order_by="priority asc"):
                 "apply_on_item_code": apply_on_items,
                 "apply_except_item_code": apply_except_items,
                 "comment": referral_fee_rule.comment,
-                "apply_on_group": referral_fee_rule.apply_on_group,
+                "apply_on_group": apply_on_group_string,
             }
         )
     result["total"] = frappe.db.count("Affiliate Referral Fee Rule")

@@ -50,7 +50,9 @@ def apply_referral_fee_rules(doc):
         apply_except_rule_item_codes = set(
             child.item_code for child in rule_doc.apply_except_item_code
         )
-        apply_on_group = rule.apply_on_group
+        apply_on_group = [
+            referral_group.user_group for referral_group in rule_doc.apply_on_group
+        ]
         if (
             (
                 len(rule_doc.apply_on_item_code) == 0
@@ -60,7 +62,7 @@ def apply_referral_fee_rules(doc):
             and (
                 apply_on_group is None
                 or apply_on_group == ""
-                or apply_on_group in affiliate_user_group
+                or set(apply_on_group).intersection(affiliate_user_group)
             )
         ):
             if referral_fee_rule:
