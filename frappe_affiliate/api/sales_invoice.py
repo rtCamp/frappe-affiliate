@@ -60,8 +60,7 @@ def apply_referral_fee_rules(doc):
             )
             and not invoice_item_codes.intersection(apply_except_rule_item_codes)
             and (
-                apply_on_group is None
-                or len(apply_on_group) == 0
+                len(apply_on_group) == 0
                 or set(apply_on_group).intersection(affiliate_user_group)
             )
         ):
