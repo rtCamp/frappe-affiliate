@@ -34,11 +34,12 @@ def validate_coupon_code(coupon_code_doc, customer=None):
         return False
 
     if isinstance(coupon_code_doc, str):
-        coupon_code_doc = frappe.get_doc(
+        coupon_doc_name = frappe.db.exists(
             "Coupon Code", {"coupon_code": coupon_code_doc}
         )
-        if not coupon_code_doc:
+        if not coupon_doc_name:
             return False
+        coupon_code_doc = frappe.get_doc("Coupon Code", coupon_doc_name)
 
     if coupon_code_doc.valid_from and getdate(coupon_code_doc.valid_from) > getdate(
         nowdate()
@@ -60,10 +61,7 @@ def validate_coupon_code(coupon_code_doc, customer=None):
     ):
         return False
 
-    if customer and coupon_code_doc.customer:
-        if coupon_code_doc.customer != customer:
-            return False
-    elif customer is None and coupon_code_doc.customer:
+    if coupon_code_doc.customer and coupon_code_doc.customer != customer:
         return False
 
     if coupon_code_doc.custom_sales_partner:
