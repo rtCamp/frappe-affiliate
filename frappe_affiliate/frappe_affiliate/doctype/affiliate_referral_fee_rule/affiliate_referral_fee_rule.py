@@ -11,7 +11,7 @@ class AffiliateReferralFeeRule(Document):
         if self.first_referral_rate > 100 or self.subsequent_referral_rate > 100:
             frappe.throw(_("Referral rates must be between 0 and 100."))
 
-        groups = self.apply_on_group or None
+        groups = self.apply_on_group
         if groups:
             for group in groups:
                 group_exists = frappe.db.exists("User Group", group.user_group)
