@@ -14,7 +14,9 @@
   "banner_and_text_link_route_path",
   "affiliate_redirect_url",
   "enable_keywords_support",
-  "banner_and_text_link"
+  "banner_and_text_link",
+  "affiliate_registration_email",
+  "intro_text_on_affiliate_info_page"
  ],
  "fields": [
   {
@@ -81,13 +83,24 @@
    "in_list_view": 1,
    "label": "Affiliate Redirect URL",
    "reqd": 1
+  },
+  {
+   "fieldname": "affiliate_registration_email",
+   "fieldtype": "Link",
+   "label": "Affiliate Registration Email",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "intro_text_on_affiliate_info_page",
+   "fieldtype": "HTML Editor",
+   "label": "Intro Text on Affiliate Info Page"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-10-23 21:44:10.978581",
+ "modified": "2025-11-12 12:32:54.390669",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Settings",
