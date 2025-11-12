@@ -17,7 +17,7 @@ def get_affiliate_coupons(affiliate_id):
 
 
 @frappe.whitelist()
-def validate_coupon_code(coupon_code):
+def validate_coupon_code(coupon_code, customer=None):
     if not coupon_code:
         return {"valid": False, "message": "No coupon code provided"}
 
@@ -46,6 +46,18 @@ def validate_coupon_code(coupon_code):
         return {
             "valid": False,
             "message": "This coupon code has reached its maximum usage limit",
+        }
+
+    if customer and coupon.customer:
+        if coupon.customer != customer:
+            return {
+                "valid": False,
+                "message": "This coupon code is not valid for this user",
+            }
+    elif customer is None and coupon.customer:
+        return {
+            "valid": False,
+            "message": "This coupon code is not valid for this user",
         }
 
     affiliate = False

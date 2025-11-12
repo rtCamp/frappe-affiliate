@@ -1,5 +1,6 @@
 import frappe
 from frappe import _ as translate
+
 from frappe_affiliate.utils.coupon_code import (
     update_coupon_code_count,
     validate_coupon_code,
@@ -12,14 +13,10 @@ def validate(doc, method=None):
 
     if doc.custom_coupon_code:
         coupon_code_doc = frappe.get_doc("Coupon Code", doc.custom_coupon_code)
-        coupon_code_valid = validate_coupon_code(coupon_code_doc)
+        coupon_code_valid = validate_coupon_code(coupon_code_doc, doc.party)
 
         if not coupon_code_valid:
             frappe.throw(translate("Invalid coupon code"))
-
-        if coupon_code_doc.customer:
-            if coupon_code_doc.customer != doc.party:
-                frappe.throw(translate("This coupon code is not valid for this user"))
 
         coupon_user_use_count = coupon_code_doc.get("custom_maximum_user_use_count", 0)
         if coupon_user_use_count > 0:

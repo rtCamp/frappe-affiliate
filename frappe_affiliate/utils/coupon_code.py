@@ -29,10 +29,19 @@ def update_coupon_code_count(coupon_code_doc, transaction_type):
                 coupon_code_doc.save(ignore_permissions=True)
 
 
-def validate_coupon_code(coupon_code_doc):
+def validate_coupon_code(coupon_code_doc, customer=None):
     if not coupon_code_doc:
         return False
-    elif coupon_code_doc.valid_from and getdate(coupon_code_doc.valid_from) > getdate(
+
+    if isinstance(coupon_code_doc, str):
+        coupon_doc_name = frappe.db.exists(
+            "Coupon Code", {"coupon_code": coupon_code_doc}
+        )
+        if not coupon_doc_name:
+            return False
+        coupon_code_doc = frappe.get_doc("Coupon Code", coupon_doc_name)
+
+    if coupon_code_doc.valid_from and getdate(coupon_code_doc.valid_from) > getdate(
         nowdate()
     ):
         return False
@@ -50,6 +59,9 @@ def validate_coupon_code(coupon_code_doc):
         and coupon_code_doc.custom_subscription_used_count
         >= coupon_code_doc.custom_subscription_maximum_use
     ):
+        return False
+
+    if coupon_code_doc.customer and coupon_code_doc.customer != customer:
         return False
 
     if coupon_code_doc.custom_sales_partner:
