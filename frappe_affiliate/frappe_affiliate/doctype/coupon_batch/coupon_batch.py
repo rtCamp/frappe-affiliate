@@ -45,6 +45,7 @@ class CouponBatch(Document):
                 "custom_coupon_batch": self.name,
                 "custom_subscription_maximum_use": self.subscription_maximum_use,
                 "custom_maximum_user_use_count": self.maximum_user_use_count,
+                "custom_disable": self.disable,
             }
         )
         coupon.save()
@@ -72,4 +73,5 @@ class CouponBatch(Document):
             coupon.valid_from = self.valid_from
             coupon.valid_upto = self.valid_upto
             coupon.maximum_use = self.maximum_use
+            coupon.custom_disable = self.disable
             coupon.save()

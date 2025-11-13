@@ -27,6 +27,7 @@
   "maximum_user_use_count",
   "subscription_maximum_use",
   "apply_to_recurring",
+  "disable",
   "column_break_11",
   "description",
   "amended_from"
@@ -167,10 +168,17 @@
    "fieldtype": "Int",
    "label": "Subscription Maximum Use",
    "non_negative": 1
+  },
+  {
+   "default": "0",
+   "description": "Disables all coupons within the batch for new purchases. Coupon remains valid for active recurring subscriptions.",
+   "fieldname": "disable",
+   "fieldtype": "Check",
+   "label": "Disable"
   }
  ],
  "links": [],
- "modified": "2025-10-28 11:15:03.945800",
+ "modified": "2025-11-13 10:18:13.852426",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Coupon Batch",

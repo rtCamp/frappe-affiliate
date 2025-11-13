@@ -23,6 +23,9 @@ def validate_coupon_code(coupon_code, customer=None):
 
     coupon = frappe.get_doc("Coupon Code", coupon_code)
 
+    if coupon.custom_disable:
+        return {"valid": False, "message": "This coupon code is not valid anymore"}
+
     if coupon.valid_from and getdate(coupon.valid_from) > getdate(nowdate()):
         return {
             "valid": False,
