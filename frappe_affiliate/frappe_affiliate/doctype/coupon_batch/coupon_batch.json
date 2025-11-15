@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_import": 1,
- "autoname": "autoincrement",
+ "autoname": "hash",
  "creation": "2025-10-04 09:17:55.864685",
  "doctype": "DocType",
  "document_type": "Other",
@@ -178,11 +178,11 @@
   }
  ],
  "links": [],
- "modified": "2025-11-13 10:18:13.852426",
+ "modified": "2025-11-15 12:42:12.749360",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Coupon Batch",
- "naming_rule": "Autoincrement",
+ "naming_rule": "Random",
  "owner": "Administrator",
  "permissions": [
   {

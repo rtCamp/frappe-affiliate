@@ -1,6 +1,6 @@
 {
  "actions": [],
- "autoname": "autoincrement",
+ "autoname": "hash",
  "creation": "2025-08-26 10:50:01.631269",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -46,9 +46,9 @@
   },
   {
    "fieldname": "apply_on_group",
-   "fieldtype": "Table",
+   "fieldtype": "Link",
    "label": "Apply on Group",
-   "options": "Referral User Group"
+   "options": "User Group"
   },
   {
    "fieldname": "apply_on_item_code",
@@ -80,11 +80,11 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-10 12:14:49.978060",
+ "modified": "2025-11-15 10:49:57.719089",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Referral Fee Rule",
- "naming_rule": "Autoincrement",
+ "naming_rule": "Random",
  "owner": "Administrator",
  "permissions": [
   {

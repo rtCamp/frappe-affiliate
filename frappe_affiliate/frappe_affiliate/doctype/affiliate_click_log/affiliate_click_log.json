@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "autoincrement",
+ "autoname": "hash",
  "creation": "2025-10-06 12:39:05.181863",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -57,11 +57,11 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-10 01:57:42.504525",
+ "modified": "2025-11-15 11:00:58.622557",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Click Log",
- "naming_rule": "Autoincrement",
+ "naming_rule": "Random",
  "owner": "Administrator",
  "permissions": [
   {
