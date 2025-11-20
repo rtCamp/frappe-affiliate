@@ -83,12 +83,12 @@ def record_referral_tiers(referral, invoice, payment_entry, tier):
         pluck="user_group",
     )
 
-    if set(affiliate_user_group).isdisjoint(tier_user_groups):
+    if tier_user_groups and set(affiliate_user_group).isdisjoint(tier_user_groups):
         return
 
     tier_referral_fee_rate = get_referral_fee_rule_for_tier(invoice, tier_user_groups)
 
-    referral = frappe.get_doc(
+    new_referral = frappe.get_doc(
         {
             "doctype": "Affiliate Referral",
             "sales_partner": parent_sales_partner,
@@ -100,4 +100,4 @@ def record_referral_tiers(referral, invoice, payment_entry, tier):
         }
     ).save()
 
-    return referral
+    return new_referral
