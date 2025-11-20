@@ -14,7 +14,14 @@
   "banner_and_text_link_route_path",
   "affiliate_redirect_url",
   "enable_keywords_support",
-  "banner_and_text_link"
+  "banner_and_text_link",
+  "affiliate_registration_email",
+  "intro_text_on_affiliate_info_page",
+  "referral_tiers_section",
+  "enable_tier_2",
+  "tier_2_groups",
+  "enable_tier_3",
+  "tier_3_groups"
  ],
  "fields": [
   {
@@ -81,13 +88,56 @@
    "in_list_view": 1,
    "label": "Affiliate Redirect URL",
    "reqd": 1
+  },
+  {
+   "fieldname": "affiliate_registration_email",
+   "fieldtype": "Link",
+   "label": "Affiliate Registration Email",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "intro_text_on_affiliate_info_page",
+   "fieldtype": "HTML Editor",
+   "label": "Intro Text on Affiliate Info Page"
+  },
+  {
+   "fieldname": "referral_tiers_section",
+   "fieldtype": "Section Break",
+   "label": "Referral Tiers"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_tier_2",
+   "fieldtype": "Check",
+   "label": "Enable Tier 2"
+  },
+  {
+   "depends_on": "eval:doc.enable_tier_2",
+   "fieldname": "tier_2_groups",
+   "fieldtype": "Table",
+   "label": "Tier 2 Groups",
+   "options": "Referral User Group"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.enable_tier_2",
+   "fieldname": "enable_tier_3",
+   "fieldtype": "Check",
+   "label": "Enable Tier 3"
+  },
+  {
+   "depends_on": "eval:doc.enable_tier_3",
+   "fieldname": "tier_3_groups",
+   "fieldtype": "Table",
+   "label": "Tier 3 Groups",
+   "options": "Referral User Group"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-10-23 21:44:10.978581",
+ "modified": "2025-11-20 04:38:03.172129",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Settings",
