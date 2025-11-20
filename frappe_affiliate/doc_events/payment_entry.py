@@ -88,6 +88,13 @@ def record_referral_tiers(referral, invoice, payment_entry, tier):
 
     tier_referral_fee_rate = get_referral_fee_rule_for_tier(invoice, tier_user_groups)
 
+    if not tier_referral_fee_rate or tier_referral_fee_rate <= 0:
+        frappe.log_error(
+            message=f"No valid referral fee rate found for tier {tier} for payment entry {payment_entry}",
+            title="Referral Fee Rate Not Found",
+        )
+        return
+
     new_referral = frappe.get_doc(
         {
             "doctype": "Affiliate Referral",
