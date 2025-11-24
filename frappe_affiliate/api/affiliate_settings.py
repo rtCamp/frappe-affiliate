@@ -14,6 +14,7 @@ def get_affiliate_settings():
         "minimum_payout": settings.minimum_payout or 0,
         "delay_payout_days": settings.delay_payout_days or 0,
         "enable_keywords_support": settings.enable_keywords_support,
+        "intro_text_on_affiliate_info_page": settings.intro_text_on_affiliate_info_page,
     }
 
 
