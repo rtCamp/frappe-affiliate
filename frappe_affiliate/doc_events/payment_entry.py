@@ -76,6 +76,7 @@ def record_referral_tiers(referral, invoice, payment_entry, tier):
         "User Group Member", filters={"user": sales_partner_user}, pluck="parent"
     )
 
+    # ToDo: investigate if get_list can be used here instead of get_all. If so then replace it.
     tier_user_groups = frappe.get_all(
         "Referral User Group",
         filters={"parentfield": f"tier_{tier}_groups", "parent": "Affiliate Settings"},
