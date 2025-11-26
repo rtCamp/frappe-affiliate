@@ -19,9 +19,13 @@ def record_click(username, banner=None):
         click_log.remote_address = frappe.local.request.remote_addr
         if banner:
             click_log.banner_id = banner
+
+        enable_keywords_support = frappe.get_cached_doc(
+            "Affiliate Settings"
+        ).enable_keywords_support
         keyword = frappe.local.request.args.get("keyword", None)
         keyword_name = None
-        if keyword and keyword != "":
+        if enable_keywords_support and keyword and keyword != "":
             keyword = escape_html(keyword)
             keyword_exists = frappe.db.exists(
                 "Affiliate Keyword",

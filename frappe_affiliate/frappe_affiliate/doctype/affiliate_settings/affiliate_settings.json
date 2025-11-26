@@ -15,6 +15,8 @@
   "affiliate_redirect_url",
   "enable_keywords_support",
   "banner_and_text_link",
+  "affiliate_registration_email",
+  "intro_text_on_affiliate_info_page",
   "referral_tiers_section",
   "enable_tier_2",
   "tier_2_groups",
@@ -86,6 +88,17 @@
    "in_list_view": 1,
    "label": "Affiliate Redirect URL",
    "reqd": 1
+  },
+  {
+   "fieldname": "affiliate_registration_email",
+   "fieldtype": "Link",
+   "label": "Affiliate Registration Email",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "intro_text_on_affiliate_info_page",
+   "fieldtype": "HTML Editor",
+   "label": "Intro Text on Affiliate Info Page"
   },
   {
    "fieldname": "referral_tiers_section",
