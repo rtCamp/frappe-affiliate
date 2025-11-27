@@ -409,7 +409,7 @@ def get_period_statistics(start_date, end_date, user=None):
         filters={
             "sales_partner": sales_partner,
             "record_type": "commission",
-            "creation": ["between", [start_datetime, end_datetime]],
+            "date": ["between", [start_datetime, end_datetime]],
             "void": 0,
         },
         fields="amount",
@@ -420,7 +420,7 @@ def get_period_statistics(start_date, end_date, user=None):
         filters={
             "sales_partner": sales_partner,
             "record_type": "void",
-            "creation": ["between", [start_datetime, end_datetime]],
+            "date": ["between", [start_datetime, end_datetime]],
             "void": 0,
         },
         fields="amount",
