@@ -50,7 +50,7 @@
   },
   {
    "fieldname": "referrer",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Referrer"
   }
  ],
