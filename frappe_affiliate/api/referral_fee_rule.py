@@ -21,7 +21,7 @@ def get_referral_fee_rules(
         order_by=order_by,
         limit_page_length=limit,
         limit_start=offset,
-        filters={"comment": ["like", comment_filter]} if comment_filter else None,
+        filters={"comment": ["like", f"%{comment_filter}%"]} if comment_filter else None,
     )
 
     result = {}
