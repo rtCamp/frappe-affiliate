@@ -61,7 +61,10 @@ def get_referral_fee_rule_for_tier(doc, group):
     invoice_item_codes = set(item.item_code for item in doc.items)
     referral_fee_rules = frappe.get_all(
         "Affiliate Referral Fee Rule",
-        filters={"disabled": 0, "apply_on_group": group},
+        filters=[
+            ["disabled", "=", 0],
+            ["Referral User Group", "user_group", "in", group],
+        ],
         fields=["name"],
     )
 
