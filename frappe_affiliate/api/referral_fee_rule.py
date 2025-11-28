@@ -4,7 +4,9 @@ from frappe_affiliate.api.sales_invoice import get_invoice_count
 
 
 @frappe.whitelist()
-def get_referral_fee_rules(limit=20, offset=0, order_by="priority asc"):
+def get_referral_fee_rules(
+    limit=20, offset=0, order_by="priority asc", comment_filter=None
+):
     referral_fee_rules_list = frappe.get_list(
         "Affiliate Referral Fee Rule",
         fields=[
@@ -19,6 +21,7 @@ def get_referral_fee_rules(limit=20, offset=0, order_by="priority asc"):
         order_by=order_by,
         limit_page_length=limit,
         limit_start=offset,
+        filters={"comment": ["like", f"%{comment_filter}%"]} if comment_filter else None,
     )
 
     result = {}
