@@ -70,7 +70,7 @@ def validate_coupon_code(
 
     if item:
         pricing_rule = coupon_code_doc.get("pricing_rule")
-        apply_on_all = frappe.get_all(
+        apply_on_specific = frappe.get_all(
             "Pricing Rule Item Code",
             filters={
                 "parent": pricing_rule,
@@ -78,7 +78,7 @@ def validate_coupon_code(
                 "parentfield": "items",
             },
         )
-        if apply_on_all:
+        if apply_on_specific:
             apply_on = frappe.get_all(
                 "Pricing Rule Item Code",
                 filters={
