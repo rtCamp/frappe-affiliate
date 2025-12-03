@@ -150,6 +150,7 @@
    "read_only": 1
   },
   {
+   "depends_on": "eval:doc.coupon_type==\"Single\"",
    "description": "unique e.g. SAVE20  To be used to get discount",
    "fieldname": "coupon_code",
    "fieldtype": "Data",
@@ -178,7 +179,7 @@
   }
  ],
  "links": [],
- "modified": "2025-11-13 10:18:13.852426",
+ "modified": "2025-11-26 13:16:39.646833",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Coupon Batch",
