@@ -36,58 +36,76 @@ def record_referral(sales_invoice_doc, payment_entry_doc):
         }
     ).save()
 
-    record_referral_tiers(referral, sales_invoice_doc, payment_entry_doc.name)
+    if frappe.get_single_value("Affiliate Settings", "enable_tier_2"):
+        referral_2 = record_referral_tiers(
+            referral, sales_invoice_doc, payment_entry_doc.name, 2
+        )
+        if (
+            frappe.get_single_value("Affiliate Settings", "enable_tier_3")
+            and referral_2
+        ):
+            record_referral_tiers(
+                referral_2, sales_invoice_doc, payment_entry_doc.name, 3
+            )
 
 
-def record_referral_tiers(referral, invoice, payment_entry):
-    current_tier = 1
+def record_referral_tiers(referral, invoice, payment_entry, tier):
     sales_partner = referral.sales_partner
 
-    while sales_partner and current_tier < 2:
-        sales_partner_customer = frappe.db.get_value(
-            "Sales Partner", sales_partner, "custom_customer"
-        )
-        parent_sales_partner = frappe.db.get_value(
-            "Customer", sales_partner_customer, "default_sales_partner"
-        )
-        if not parent_sales_partner:
-            return
-        parent_banned = frappe.db.get_value(
-            "Sales Partner",
-            parent_sales_partner,
-            ["custom_banned", "custom_disabled"],
-            as_dict=True,
-        )
-        sales_partner_user = frappe.db.get_value(
-            "Sales Partner", parent_sales_partner, "custom_user"
-        )
-        if parent_banned.custom_disabled == 1 or parent_banned.custom_banned == 1:
-            continue
+    sales_partner_customer = frappe.db.get_value(
+        "Sales Partner", sales_partner, "custom_customer"
+    )
+    parent_sales_partner = frappe.db.get_value(
+        "Customer", sales_partner_customer, "default_sales_partner"
+    )
+    if not parent_sales_partner:
+        return
+    parent_banned = frappe.db.get_value(
+        "Sales Partner",
+        parent_sales_partner,
+        ["custom_banned", "custom_disabled"],
+        as_dict=True,
+    )
+    sales_partner_user = frappe.db.get_value(
+        "Sales Partner", parent_sales_partner, "custom_user"
+    )
+    if parent_banned.custom_disabled == 1 or parent_banned.custom_banned == 1:
+        return
 
-        affiliate_user_group = frappe.get_all(
-            "User Group Member", filters={"user": sales_partner_user}, pluck="parent"
+    affiliate_user_group = frappe.get_all(
+        "User Group Member", filters={"user": sales_partner_user}, pluck="parent"
+    )
+
+    # ToDo: investigate if get_list can be used here instead of get_all. If so then replace it.
+    tier_user_groups = frappe.get_all(
+        "Referral User Group",
+        filters={"parentfield": f"tier_{tier}_groups", "parent": "Affiliate Settings"},
+        fields=["user_group"],
+        pluck="user_group",
+    )
+
+    if tier_user_groups and set(affiliate_user_group).isdisjoint(tier_user_groups):
+        return
+
+    tier_referral_fee_rate = get_referral_fee_rule_for_tier(invoice, tier_user_groups)
+
+    if not tier_referral_fee_rate or tier_referral_fee_rate <= 0:
+        frappe.log_error(
+            message=f"No valid referral fee rate found for tier {tier} for payment entry {payment_entry}",
+            title="Referral Fee Rate Not Found",
         )
+        return
 
-        if "Affiliate Tier {}".format(current_tier) not in affiliate_user_group:
-            sales_partner = parent_sales_partner
-            current_tier += 1
-            continue
+    new_referral = frappe.get_doc(
+        {
+            "doctype": "Affiliate Referral",
+            "sales_partner": parent_sales_partner,
+            "payment_entry": payment_entry,
+            "amount": (referral.amount / 100) * tier_referral_fee_rate,
+            "date": referral.date,
+            "record_type": "commission",
+            "tier": tier - 1,
+        }
+    ).save()
 
-        tier_referral_fee_rate = get_referral_fee_rule_for_tier(
-            invoice, "Affiliate Tier {}".format(current_tier)
-        )
-
-        frappe.get_doc(
-            {
-                "doctype": "Affiliate Referral",
-                "sales_partner": parent_sales_partner,
-                "payment_entry": payment_entry,
-                "amount": (referral.amount / 100) * tier_referral_fee_rate,
-                "date": referral.date,
-                "record_type": "commission",
-                "tier": current_tier,
-            }
-        ).save()
-
-        current_tier += 1
-        sales_partner = parent_sales_partner
+    return new_referral
