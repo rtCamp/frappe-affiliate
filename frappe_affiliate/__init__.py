@@ -16,28 +16,28 @@ from erpnext.accounts.doctype.pricing_rule.pricing_rule import (
 )
 from erpnext.accounts.doctype.pricing_rule.utils import (
     _get_tree_conditions,
+    get_applied_pricing_rules,
     get_other_conditions,
+    get_pricing_rule_items,
+    get_pricing_rules,
+    get_product_discount_rule,
 )
 from frappe import _
 from frappe.utils import getdate, today
 
-from frappe_affiliate.api.sales_invoice import get_invoice_count
-
 
 def monkey_patch():
+    # ToDo: Debug and analyse the root cause why in some instances original function is called instead of monkey patched one.
+    # For now the specific call is patched here to prevent this from happening.
+    from erpnext.stock import get_item_details  # nosemgrep
+
+    get_item_details.get_pricing_rule_for_item = get_pricing_rule_for_item  # nosemgrep
     pricing_rule.get_pricing_rule_for_item = get_pricing_rule_for_item  # nosemgrep
     utils.validate_coupon_code = validate_coupon_code  # nosemgrep
     utils._get_pricing_rules = _get_pricing_rules  # nosemgrep
 
 
 def get_pricing_rule_for_item(args, doc=None, for_validate=False):
-    from erpnext.accounts.doctype.pricing_rule.utils import (
-        get_applied_pricing_rules,
-        get_pricing_rule_items,
-        get_pricing_rules,
-        get_product_discount_rule,
-    )
-
     if isinstance(doc, str):
         doc = json.loads(doc)
 
@@ -278,6 +278,14 @@ def _get_pricing_rules(apply_on, args, values):
     )
 
     return pricing_rules
+
+
+def get_invoice_count(doc):
+    count = frappe.db.count(
+        "Sales Invoice",
+        {"customer": doc.customer, "subscription": doc.subscription, "docstatus": 1},
+    )
+    return count
 
 
 try:
