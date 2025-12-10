@@ -12,6 +12,10 @@ from frappe.utils.data import (
     cint,
 )
 
+from frappe_affiliate.utils.coupon_code import (
+    get_first_recurring_discount,
+)
+
 DateTimeLikeObject = str | date
 
 
@@ -127,13 +131,51 @@ class SubscriptionOverride(Subscription):
 
         invoice.flags.ignore_mandatory = True
 
+        subscription_current_first_cost = self.get("custom_first_cost", None)
+        first_recurring_cost_set = (
+            True
+            if subscription_current_first_cost and subscription_current_first_cost > 0
+            else False
+        )
+
         # Function had to be overridden to add custom coupon code here just before pricing rule related functions are executed.
         if self.get("custom_coupon_code", None):
             invoice.coupon_code = self.custom_coupon_code
+            if not first_recurring_cost_set:
+                first_discount = get_first_recurring_discount(
+                    invoice.coupon_code,
+                    recurring=False,
+                )
+                if first_discount["type"] == "discount_percentage":
+                    invoice.additional_discount_percentage = first_discount["value"]
+                elif first_discount["type"] == "discount_amount":
+                    invoice.discount_amount = first_discount["value"]
+                invoice.apply_discount_on = "Net Total"
 
         invoice.set_missing_values()
 
         invoice.save()
+
+        invoice.reload()
+
+        net_total = invoice.total
+
+        if not first_recurring_cost_set:
+            first_cost = invoice.net_total
+            recurring_discount = get_first_recurring_discount(
+                invoice.coupon_code,
+                recurring=True,
+            )
+            recurring_cost = calculate_recurring_cost(recurring_discount, net_total)
+            frappe.db.set_value(
+                "Subscription",
+                self.name,
+                {
+                    "custom_first_cost": first_cost,
+                    "custom_recurring_cost": recurring_cost,
+                },
+            )
+            self.reload()
 
         if self.submit_invoice:
             invoice.submit()
@@ -145,3 +187,14 @@ class SubscriptionOverride(Subscription):
         Returns `True` if the `Subscription` is in trial period.
         """
         return not self.period_has_passed(self.trial_period_end)
+
+
+def calculate_recurring_cost(discount, net_total):
+    if discount["type"] == "discount_percentage":
+        discount_value = (discount["value"] / 100) * net_total
+    elif discount["type"] == "discount_amount":
+        discount_value = discount["value"]
+    else:
+        discount_value = 0.0
+    recurring_cost = net_total - discount_value
+    return min(recurring_cost, net_total)

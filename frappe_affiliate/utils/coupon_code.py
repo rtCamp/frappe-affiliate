@@ -70,37 +70,9 @@ def validate_coupon_code(
 
     if item:
         pricing_rule = coupon_code_doc.get("pricing_rule")
-        apply_on_specific = frappe.get_all(
-            "Pricing Rule Item Code",
-            filters={
-                "parent": pricing_rule,
-                "parenttype": "Pricing Rule",
-                "parentfield": "items",
-            },
-        )
-        if apply_on_specific:
-            apply_on = frappe.get_all(
-                "Pricing Rule Item Code",
-                filters={
-                    "parent": pricing_rule,
-                    "parenttype": "Pricing Rule",
-                    "item_code": item,
-                    "parentfield": "items",
-                },
-            )
-            if not apply_on:
+        if pricing_rule:
+            if not check_item_in_coupon_pricing_rule([item], pricing_rule):
                 return False
-        apply_except = frappe.get_all(
-            "Pricing Rule Item Code",
-            filters={
-                "parent": pricing_rule,
-                "parenttype": "Pricing Rule",
-                "item_code": item,
-                "parentfield": "custom_apply_except_item_code",
-            },
-        )
-        if apply_except:
-            return False
 
     if coupon_code_doc.custom_sales_partner:
         affiliate_banned = frappe.db.get_value(
@@ -113,3 +85,72 @@ def validate_coupon_code(
             return False
 
     return True
+
+
+def check_item_in_coupon_pricing_rule(item_list, pricing_rule):
+    apply_on_specific = frappe.get_all(
+        "Pricing Rule Item Code",
+        filters={
+            "parent": pricing_rule,
+            "parenttype": "Pricing Rule",
+            "parentfield": "items",
+        },
+    )
+    if apply_on_specific and apply_on_specific != []:
+        apply_on = frappe.get_all(
+            "Pricing Rule Item Code",
+            filters={
+                "parent": pricing_rule,
+                "parenttype": "Pricing Rule",
+                "item_code": ["in", item_list],
+                "parentfield": "items",
+            },
+        )
+        if not apply_on:
+            return False
+    apply_except = frappe.get_all(
+        "Pricing Rule Item Code",
+        filters={
+            "parent": pricing_rule,
+            "parenttype": "Pricing Rule",
+            "item_code": ["in", item_list],
+            "parentfield": "custom_apply_except_item_code",
+        },
+    )
+    if apply_except:
+        return False
+
+
+def get_first_recurring_discount(coupon_code, recurring=False):
+    result = {
+        "type": None,
+        "value": 0.0,
+    }
+
+    if not coupon_code:
+        return result
+
+    coupon_code_doc = frappe.get_doc("Coupon Code", coupon_code, cache=True)
+    if not coupon_code_doc:
+        return result
+    apply_to_recurring = coupon_code_doc.get("custom_apply_to_recurring")
+    if recurring and not apply_to_recurring:
+        return result
+    pricing_rule_field = (
+        "custom_recurring_pricing_rule" if recurring else "pricing_rule"
+    )
+
+    pricing_rule = coupon_code_doc.get(pricing_rule_field)
+    if not pricing_rule:
+        return result
+    pricing_rule_doc = frappe.get_doc("Pricing Rule", pricing_rule, cache=True)
+    if not pricing_rule_doc:
+        return result
+    field_name = (
+        "discount_percentage"
+        if pricing_rule_doc.rate_or_discount == "Discount Percentage"
+        else "discount_amount"
+    )
+    result["type"] = field_name
+    result["value"] = pricing_rule_doc.get(field_name) or 0.0
+    return result
