@@ -141,10 +141,36 @@ def get_period_statistics(start_date, end_date):
 
 
 @frappe.whitelist(methods=["GET"])
-def get_click_log_for_statistic(date: str | None = None, by_month=1) -> list:
+def get_click_log_for_statistic(
+    date: str | None = None, by_month=1, start: int = 0, limit: int = 20
+) -> list:
     """
     Get click log entries for a specific date
-    If by_month is True, date is expected in 'YYYY-MM' format, else 'YYYY-MM-DD' format
+
+    Params:
+    - date (str): The date or month for which to retrieve click logs.
+    - by_month (int): If 1, date is treated as month (YYYY-MM); if 0, as specific date (YYYY-MM-DD).
+    - start (int): The starting index for pagination.
+    - limit (int): The number of records to retrieve.
+
+    Response:
+        {
+        "message": {
+            "click_logs": [
+                {
+                    "time": "2025-11-25 10:52:27",
+                    "referrer": null
+                },
+                {
+                    "time": "2025-11-25 10:52:27",
+                    "referrer": "https://www.google.com"
+                }
+            ],
+            "total": 2,
+            "start": 0,
+            "limit": 20
+        }
+    },
     """
     by_month = cint(by_month)
 
@@ -170,14 +196,28 @@ def get_click_log_for_statistic(date: str | None = None, by_month=1) -> list:
         hour=23, minute=59, second=59
     )
 
+    filters = {
+        "sales_partner": sales_partner,
+        "time": ["between", [start_datetime, end_datetime]],
+    }
+
     click_logs = frappe.get_all(
         "Affiliate Click Log",
-        filters={
-            "sales_partner": sales_partner,
-            "time": ["between", [start_datetime, end_datetime]],
-        },
+        filters=filters,
         order_by="time desc",
         fields=["time", "referrer"],
+        start=start,
+        limit=limit,
     )
 
-    return click_logs
+    total_clicks = frappe.db.count(
+        "Affiliate Click Log",
+        filters=filters,
+    )
+
+    return {
+        "click_logs": click_logs,
+        "total": total_clicks,
+        "start": start,
+        "limit": limit,
+    }
