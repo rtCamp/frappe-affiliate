@@ -97,7 +97,7 @@ def update_coupon_code_count(coupon_code_doc, transaction_type):
 
 
 def validate_coupon_code(
-    coupon_code_doc, customer=None, is_new_subscription=False
+    coupon_code_doc, customer=None, is_new_subscription=False, item=None
 ) -> bool:
     if not coupon_code_doc:
         return False
@@ -134,6 +134,40 @@ def validate_coupon_code(
 
     if coupon_code_doc.customer and coupon_code_doc.customer != customer:
         return False
+
+    if item:
+        pricing_rule = coupon_code_doc.get("pricing_rule")
+        apply_on_specific = frappe.get_all(
+            "Pricing Rule Item Code",
+            filters={
+                "parent": pricing_rule,
+                "parenttype": "Pricing Rule",
+                "parentfield": "items",
+            },
+        )
+        if apply_on_specific:
+            apply_on = frappe.get_all(
+                "Pricing Rule Item Code",
+                filters={
+                    "parent": pricing_rule,
+                    "parenttype": "Pricing Rule",
+                    "item_code": item,
+                    "parentfield": "items",
+                },
+            )
+            if not apply_on:
+                return False
+        apply_except = frappe.get_all(
+            "Pricing Rule Item Code",
+            filters={
+                "parent": pricing_rule,
+                "parenttype": "Pricing Rule",
+                "item_code": item,
+                "parentfield": "custom_apply_except_item_code",
+            },
+        )
+        if apply_except:
+            return False
 
     if coupon_code_doc.custom_sales_partner:
         affiliate_banned = frappe.db.get_value(
