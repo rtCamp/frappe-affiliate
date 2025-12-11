@@ -117,9 +117,9 @@ def check_item_in_coupon_pricing_rule(item_list, pricing_rule):
             "parentfield": "custom_apply_except_item_code",
         },
     )
-    if apply_except:
+    if apply_except and apply_except != []:
         return False
-
+    return True
 
 def get_first_recurring_discount(coupon_code, recurring=False):
     result = {
