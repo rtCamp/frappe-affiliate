@@ -181,7 +181,7 @@ def _apply_promotional_offer_hooks(coupon_code, plans=None):
         ]
 
     Example hook implementation:
-        def apply_summer_sale_discount(items=None):
+        def apply_summer_sale_discount(coupon_code, plans=None):
             return {
                 "type": "Percentage",
                 "value": 20.0

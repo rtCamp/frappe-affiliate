@@ -146,9 +146,13 @@ class SubscriptionOverride(Subscription):
                     invoice.coupon_code, recurring=False, plans=self.plans
                 )
                 if first_discount["type"] == "Percentage":
-                    invoice.additional_discount_percentage = first_discount["value"]
+                    invoice.additional_discount_percentage = (
+                        invoice.additional_discount_percentage + first_discount["value"]
+                    )
                 elif first_discount["type"] == "Amount":
-                    invoice.discount_amount = first_discount["value"]
+                    invoice.discount_amount = (
+                        invoice.discount_amount + first_discount["value"]
+                    )
                 invoice.apply_discount_on = "Net Total"
 
         invoice.set_missing_values()
@@ -159,7 +163,7 @@ class SubscriptionOverride(Subscription):
 
         net_total = invoice.total
 
-        if not first_recurring_cost_set:
+        if self.get("custom_coupon_code", None) and not first_recurring_cost_set:
             first_cost = invoice.net_total
             recurring_discount = get_first_recurring_discount(
                 invoice.coupon_code, recurring=True, plans=self.plans
@@ -195,4 +199,4 @@ def calculate_recurring_cost(discount, net_total):
     else:
         discount_value = 0.0
     recurring_cost = net_total - discount_value
-    return min(recurring_cost, net_total)
+    return max(0, min(recurring_cost, net_total))
