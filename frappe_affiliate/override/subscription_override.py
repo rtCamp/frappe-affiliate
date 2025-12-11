@@ -143,12 +143,11 @@ class SubscriptionOverride(Subscription):
             invoice.coupon_code = self.custom_coupon_code
             if not first_recurring_cost_set:
                 first_discount = get_first_recurring_discount(
-                    invoice.coupon_code,
-                    recurring=False,
+                    invoice.coupon_code, recurring=False, plans=self.plans
                 )
-                if first_discount["type"] == "discount_percentage":
+                if first_discount["type"] == "Percentage":
                     invoice.additional_discount_percentage = first_discount["value"]
-                elif first_discount["type"] == "discount_amount":
+                elif first_discount["type"] == "Amount":
                     invoice.discount_amount = first_discount["value"]
                 invoice.apply_discount_on = "Net Total"
 
@@ -163,8 +162,7 @@ class SubscriptionOverride(Subscription):
         if not first_recurring_cost_set:
             first_cost = invoice.net_total
             recurring_discount = get_first_recurring_discount(
-                invoice.coupon_code,
-                recurring=True,
+                invoice.coupon_code, recurring=True, plans=self.plans
             )
             recurring_cost = calculate_recurring_cost(recurring_discount, net_total)
             frappe.db.set_value(
@@ -190,9 +188,9 @@ class SubscriptionOverride(Subscription):
 
 
 def calculate_recurring_cost(discount, net_total):
-    if discount["type"] == "discount_percentage":
+    if discount["type"] == "Percentage":
         discount_value = (discount["value"] / 100) * net_total
-    elif discount["type"] == "discount_amount":
+    elif discount["type"] == "Amount":
         discount_value = discount["value"]
     else:
         discount_value = 0.0

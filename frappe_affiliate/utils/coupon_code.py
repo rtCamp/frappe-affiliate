@@ -121,36 +121,102 @@ def check_item_in_coupon_pricing_rule(item_list, pricing_rule):
         return False
     return True
 
-def get_first_recurring_discount(coupon_code, recurring=False):
+
+def get_first_recurring_discount(coupon_code, recurring=False, plans=None):
     result = {
         "type": None,
         "value": 0.0,
     }
 
+    promotional_offer = _apply_promotional_offer_hooks(coupon_code, plans=plans)
+    if promotional_offer:
+        return promotional_offer
+
     if not coupon_code:
         return result
 
-    coupon_code_doc = frappe.get_doc("Coupon Code", coupon_code, cache=True)
-    if not coupon_code_doc:
+    coupon_batch = frappe.get_value("Coupon Code", coupon_code, "custom_coupon_batch")
+
+    if not coupon_batch:
         return result
-    apply_to_recurring = coupon_code_doc.get("custom_apply_to_recurring")
-    if recurring and not apply_to_recurring:
-        return result
-    pricing_rule_field = (
-        "custom_recurring_pricing_rule" if recurring else "pricing_rule"
+
+    coupon_batch_values = frappe.db.get_value(
+        "Coupon Batch",
+        coupon_batch,
+        [
+            "rate_or_discount",
+            "discount",
+            "recurring_rate_or_discount",
+            "recurring_discount",
+            "apply_to_recurring",
+        ],
+        as_dict=True,
     )
 
-    pricing_rule = coupon_code_doc.get(pricing_rule_field)
-    if not pricing_rule:
+    if not coupon_batch_values:
         return result
-    pricing_rule_doc = frappe.get_doc("Pricing Rule", pricing_rule, cache=True)
-    if not pricing_rule_doc:
+    if recurring and not coupon_batch_values.get("apply_to_recurring"):
         return result
-    field_name = (
-        "discount_percentage"
-        if pricing_rule_doc.rate_or_discount == "Discount Percentage"
-        else "discount_amount"
-    )
-    result["type"] = field_name
-    result["value"] = pricing_rule_doc.get(field_name) or 0.0
+
+    recurring_string = "recurring_" if recurring else ""
+
+    result["type"] = coupon_batch_values.get(f"{recurring_string}rate_or_discount")
+    result["value"] = coupon_batch_values.get(f"{recurring_string}discount") or 0.0
     return result
+
+
+def _apply_promotional_offer_hooks(coupon_code, plans=None):
+    """
+    Allow other apps to hook into and modify the coupon discount logic via the
+    'apply_promotional_offer' hook.
+
+    Each hook method should return discount details as a dict with keys:
+      - type: either "Percentage" or "Amount"
+      - value: the discount value as a float
+    By default the hook returning the highest discount value will be applied.
+
+    Example (in another app's hooks.py):
+        apply_promotional_offer = [
+            "my_app.promo_hooks.apply_summer_sale_discount",
+        ]
+
+    Example hook implementation:
+        def apply_summer_sale_discount(items=None):
+            return {
+                "type": "Percentage",
+                "value": 20.0
+            }
+
+    Params:
+        coupon_code (str): The coupon code to evaluate.
+        plans (list, optional): List of plans to check for promotions. Defaults to None.
+    """
+    return_result = {
+        "type": None,
+        "value": 0.0,
+    }
+    promo_applies = False
+    for method_path in frappe.get_hooks("apply_promotional_offer") or []:
+        try:
+            method = frappe.get_attr(method_path)
+        except Exception:
+            frappe.log_error(
+                frappe.get_traceback(), "apply_promotional_offer hook import failure"
+            )
+            continue
+        try:
+            result = method(coupon_code=coupon_code, plans=plans)
+            if result is None:
+                continue
+            else:
+                promo_applies = True
+                if return_result["value"] < result["value"]:
+                    return_result = result
+        except Exception:
+            frappe.log_error(
+                frappe.get_traceback(), "apply_promotional_offer hook execution failure"
+            )
+    if promo_applies:
+        return return_result
+    else:
+        return None

@@ -9,13 +9,19 @@
  "engine": "InnoDB",
  "field_order": [
   "coupon_name",
-  "coupon_type",
   "customer",
   "sales_partner",
   "column_break_4",
+  "coupon_type",
   "coupon_code",
-  "pricing_rule",
-  "recurring_pricing_rule",
+  "conditions_section",
+  "rate_or_discount",
+  "discount",
+  "recurring_rate_or_discount",
+  "recurring_discount",
+  "column_break_sohp",
+  "apply_on_item_code",
+  "apply_except_item_code",
   "batch_generation_section",
   "coupons_count",
   "code_length",
@@ -64,22 +70,6 @@
   {
    "fieldname": "column_break_4",
    "fieldtype": "Column Break"
-  },
-  {
-   "depends_on": "eval: !doc.from_external_ecomm_platform",
-   "fieldname": "pricing_rule",
-   "fieldtype": "Link",
-   "label": "Pricing Rule",
-   "mandatory_depends_on": "eval: !doc.from_external_ecomm_platform",
-   "options": "Pricing Rule"
-  },
-  {
-   "depends_on": "eval:doc.apply_to_recurring",
-   "fieldname": "recurring_pricing_rule",
-   "fieldtype": "Link",
-   "label": "Recurring Pricing Rule",
-   "mandatory_depends_on": "eval:doc.apply_to_recurring",
-   "options": "Pricing Rule"
   },
   {
    "depends_on": "eval:doc.coupon_type == \"Batch of Random Coupon Codes\"",
@@ -176,10 +166,61 @@
    "fieldname": "disable",
    "fieldtype": "Check",
    "label": "Disable"
+  },
+  {
+   "fieldname": "conditions_section",
+   "fieldtype": "Section Break",
+   "label": "Conditions"
+  },
+  {
+   "default": "Percentage",
+   "fieldname": "rate_or_discount",
+   "fieldtype": "Select",
+   "label": "Rate or Discount",
+   "options": "Percentage\nAmount",
+   "reqd": 1
+  },
+  {
+   "fieldname": "discount",
+   "fieldtype": "Float",
+   "label": "Discount",
+   "reqd": 1
+  },
+  {
+   "default": "Percentage",
+   "depends_on": "eval:doc.apply_to_recurring",
+   "fieldname": "recurring_rate_or_discount",
+   "fieldtype": "Select",
+   "label": "Recurring Rate or Discount",
+   "mandatory_depends_on": "eval:doc.apply_to_recurring",
+   "options": "Percentage\nAmount"
+  },
+  {
+   "depends_on": "eval:doc.apply_to_recurring",
+   "fieldname": "recurring_discount",
+   "fieldtype": "Currency",
+   "label": "Recurring Discount",
+   "mandatory_depends_on": "eval:doc.apply_to_recurring"
+  },
+  {
+   "fieldname": "column_break_sohp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "apply_on_item_code",
+   "fieldtype": "Table",
+   "label": "Apply On Item Code",
+   "options": "Pricing Rule Item Code"
+  },
+  {
+   "fieldname": "apply_except_item_code",
+   "fieldtype": "Table",
+   "label": "Apply Except Item Code",
+   "options": "Pricing Rule Item Code"
   }
  ],
  "links": [],
- "modified": "2025-11-26 13:16:39.646833",
+ "modified": "2025-12-11 11:49:17.958491",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Coupon Batch",
