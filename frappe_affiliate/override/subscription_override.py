@@ -147,11 +147,18 @@ class SubscriptionOverride(Subscription):
                 )
                 if first_discount["type"] == "Percentage":
                     invoice.additional_discount_percentage = (
-                        invoice.additional_discount_percentage + first_discount["value"]
+                        (
+                            invoice.additional_discount_percentage
+                            + first_discount["value"]
+                        )
+                        if invoice.additional_discount_percentage
+                        else first_discount["value"]
                     )
                 elif first_discount["type"] == "Amount":
                     invoice.discount_amount = (
-                        invoice.discount_amount + first_discount["value"]
+                        (invoice.discount_amount + first_discount["value"])
+                        if invoice.discount_amount
+                        else first_discount["value"]
                     )
                 invoice.apply_discount_on = "Net Total"
 
