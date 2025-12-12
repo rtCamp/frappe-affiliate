@@ -128,7 +128,9 @@ def get_first_recurring_discount(coupon_code, recurring=False, plans=None):
         "value": 0.0,
     }
 
-    promotional_offer = _apply_promotional_offer_hooks(coupon_code, plans=plans)
+    promotional_offer = _apply_promotional_offer_hooks(
+        coupon_code, plans=plans, recurring=recurring
+    )
     if promotional_offer:
         return promotional_offer
 
@@ -165,7 +167,7 @@ def get_first_recurring_discount(coupon_code, recurring=False, plans=None):
     return result
 
 
-def _apply_promotional_offer_hooks(coupon_code, plans=None):
+def _apply_promotional_offer_hooks(coupon_code, plans=None, recurring=False):
     """
     Allow other apps to hook into and modify the coupon discount logic via the
     'apply_promotional_offer' hook.
@@ -173,6 +175,7 @@ def _apply_promotional_offer_hooks(coupon_code, plans=None):
     Each hook method should return discount details as a dict with keys:
       - type: either "Percentage" or "Amount"
       - value: the discount value as a float
+      - recurring: bool indicating if the discount is for recurring charges
     By default the hook returning the highest discount value will be applied.
 
     Example (in another app's hooks.py):
@@ -205,7 +208,7 @@ def _apply_promotional_offer_hooks(coupon_code, plans=None):
             )
             continue
         try:
-            result = method(coupon_code=coupon_code, plans=plans)
+            result = method(coupon_code=coupon_code, plans=plans, recurring=recurring)
             if result is None:
                 continue
             else:
