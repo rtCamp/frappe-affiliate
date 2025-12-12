@@ -69,9 +69,9 @@ def validate_coupon_code(
         return False
 
     if item:
-        pricing_rule = coupon_code_doc.get("pricing_rule")
-        if pricing_rule:
-            if not check_item_in_coupon_pricing_rule([item], pricing_rule):
+        coupon_batch = coupon_code_doc.get("custom_coupon_batch", None)
+        if coupon_batch:
+            if not check_item_in_coupon_batch([item], coupon_batch):
                 return False
 
     if coupon_code_doc.custom_sales_partner:
@@ -87,23 +87,23 @@ def validate_coupon_code(
     return True
 
 
-def check_item_in_coupon_pricing_rule(item_list, pricing_rule):
+def check_item_in_coupon_batch(item_list, coupon_batch):
     apply_on_specific = frappe.get_all(
         "Pricing Rule Item Code",
         filters={
-            "parent": pricing_rule,
-            "parenttype": "Pricing Rule",
-            "parentfield": "items",
+            "parent": coupon_batch,
+            "parenttype": "Coupon Batch",
+            "parentfield": "apply_on_item_code",
         },
     )
     if apply_on_specific and apply_on_specific != []:
         apply_on = frappe.get_all(
             "Pricing Rule Item Code",
             filters={
-                "parent": pricing_rule,
-                "parenttype": "Pricing Rule",
+                "parent": coupon_batch,
+                "parenttype": "Coupon Batch",
                 "item_code": ["in", item_list],
-                "parentfield": "items",
+                "parentfield": "apply_on_item_code",
             },
         )
         if not apply_on:
@@ -111,10 +111,10 @@ def check_item_in_coupon_pricing_rule(item_list, pricing_rule):
     apply_except = frappe.get_all(
         "Pricing Rule Item Code",
         filters={
-            "parent": pricing_rule,
-            "parenttype": "Pricing Rule",
+            "parent": coupon_batch,
+            "parenttype": "Coupon Batch",
             "item_code": ["in", item_list],
-            "parentfield": "custom_apply_except_item_code",
+            "parentfield": "apply_except_item_code",
         },
     )
     if apply_except and apply_except != []:
