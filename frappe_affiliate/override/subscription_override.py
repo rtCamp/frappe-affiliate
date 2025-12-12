@@ -172,10 +172,9 @@ class SubscriptionOverride(Subscription):
 
         if self.get("custom_coupon_code", None) and not first_recurring_cost_set:
             first_cost = invoice.net_total
-            recurring_discount = get_first_recurring_discount(
-                invoice.coupon_code, recurring=True, plans=self.plans
+            recurring_cost = calculate_recurring_cost(
+                invoice.coupon_code, self.plans, net_total
             )
-            recurring_cost = calculate_recurring_cost(recurring_discount, net_total)
             frappe.db.set_value(
                 "Subscription",
                 self.name,
@@ -198,12 +197,83 @@ class SubscriptionOverride(Subscription):
         return not self.period_has_passed(self.trial_period_end)
 
 
-def calculate_recurring_cost(discount, net_total):
-    if discount["type"] == "Percentage":
-        discount_value = (discount["value"] / 100) * net_total
-    elif discount["type"] == "Amount":
-        discount_value = discount["value"]
+def calculate_recurring_cost(coupon_code, plans, net_total):
+    recurring_discount = get_first_recurring_discount(
+        coupon_code, recurring=True, plans=plans
+    )
+    recurring_override = _apply_recurring_discount_hooks(
+        coupon_code=coupon_code,
+        recurring_discount=recurring_discount,
+        plans=plans,
+        net_total=net_total,
+    )
+    if recurring_override is not None:
+        return recurring_override
+
+    if recurring_discount["type"] == "Percentage":
+        discount_value = (recurring_discount["value"] / 100) * net_total
+    elif recurring_discount["type"] == "Amount":
+        discount_value = recurring_discount["value"]
     else:
         discount_value = 0.0
     recurring_cost = net_total - discount_value
     return max(0, min(recurring_cost, net_total))
+
+
+def _apply_recurring_discount_hooks(
+    coupon_code, recurring_discount, plans, net_total=0.0
+):
+    """
+    Allow other apps to hook into and modify the recurring discount logic via the
+    'recurring_discount_override' hook.
+
+    Each hook method should return discounted amount as a float.:
+
+    Example (in another app's hooks.py):
+        recurring_discount_override = [
+            "my_app.promo_hooks.apply_summer_sale_discount",
+        ]
+
+    Example hook implementation:
+        def apply_summer_sale_discount(coupon_code, plans, net_total=0.0):
+            return 20.0
+
+    Params:
+        coupon_code (str): The coupon code to evaluate.
+        recurring_discount (dict): The recurring discount details.
+        plans (list): List of plans to check for promotions.
+        net_total (float, optional): net amount before taxation on first invoice. Defaults to 0.0.
+    """
+    return_result = net_total
+    override_recurring = False
+    for method_path in frappe.get_hooks("recurring_discount_override") or []:
+        try:
+            method = frappe.get_attr(method_path)
+        except Exception:
+            frappe.log_error(
+                frappe.get_traceback(),
+                "recurring_discount_override hook import failure",
+            )
+            continue
+        try:
+            result = method(
+                coupon_code=coupon_code,
+                recurring_discount=recurring_discount,
+                plans=plans,
+                net_total=net_total,
+            )
+            if result is None:
+                continue
+            else:
+                override_recurring = True
+                if return_result > result:
+                    return_result = result
+        except Exception:
+            frappe.log_error(
+                frappe.get_traceback(),
+                "recurring_discount_override hook execution failure",
+            )
+    if override_recurring:
+        return return_result
+    else:
+        return None
