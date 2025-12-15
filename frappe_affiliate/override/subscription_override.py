@@ -254,9 +254,11 @@ def _apply_recurring_discount_hooks(
         plans (list): List of plans to check for promotions.
         net_total (float, optional): net amount before taxation on first invoice. Defaults to 0.0.
     """
-    return_result = net_total
-    override_recurring = False
-    for method_path in frappe.get_hooks("recurring_discount_override") or []:
+    hooks = frappe.get_hooks("recurring_discount_override") or []
+    method_path = None
+    if hooks and len(hooks) > 0:
+        method_path = hooks[-1]
+    if method_path:
         try:
             method = frappe.get_attr(method_path)
         except Exception:
@@ -264,7 +266,7 @@ def _apply_recurring_discount_hooks(
                 frappe.get_traceback(),
                 "recurring_discount_override hook import failure",
             )
-            continue
+            return None
         try:
             result = method(
                 coupon_code=coupon_code,
@@ -273,17 +275,11 @@ def _apply_recurring_discount_hooks(
                 net_total=net_total,
             )
             if result is None:
-                continue
+                return None
             else:
-                override_recurring = True
-                if return_result > result:
-                    return_result = result
+                return result
         except Exception:
             frappe.log_error(
                 frappe.get_traceback(),
                 "recurring_discount_override hook execution failure",
             )
-    if override_recurring:
-        return return_result
-    else:
-        return None
