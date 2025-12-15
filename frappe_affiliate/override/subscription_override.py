@@ -184,6 +184,16 @@ class SubscriptionOverride(Subscription):
                 },
             )
             self.reload()
+        elif not first_recurring_cost_set:
+            frappe.db.set_value(
+                "Subscription",
+                self.name,
+                {
+                    "custom_first_cost": net_total,
+                    "custom_recurring_cost": net_total,
+                },
+            )
+            self.reload()
 
         if self.submit_invoice:
             invoice.submit()
