@@ -15,15 +15,7 @@ from frappe.utils.data import (
 DateTimeLikeObject = str | date
 
 
-if "frappe_optimizations" in frappe.get_installed_apps():
-    from frappe_optimizations.override.subscription import OptimizeSubscriptionOverride
-
-    BaseSubscription = OptimizeSubscriptionOverride
-else:
-    BaseSubscription = Subscription
-
-
-class SubscriptionOverride(BaseSubscription):
+class SubscriptionOverride(Subscription):
     def create_invoice(
         self,
         from_date: DateTimeLikeObject | None = None,
