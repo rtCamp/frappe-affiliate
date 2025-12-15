@@ -171,7 +171,7 @@ def _apply_promotional_offer_hooks(coupon_code, plans=None, recurring=False):
       - type: either "Percentage" or "Amount"
       - value: the discount value as a float
       - recurring: bool indicating if the discount is for recurring charges
-    By default the hook returning the highest discount value will be applied.
+    By default the last hook will be applied.
 
     Example (in another app's hooks.py):
         apply_promotional_offer = [
@@ -189,32 +189,25 @@ def _apply_promotional_offer_hooks(coupon_code, plans=None, recurring=False):
         coupon_code (str): The coupon code to evaluate.
         plans (list, optional): List of plans to check for promotions. Defaults to None.
     """
-    return_result = {
-        "type": None,
-        "value": 0.0,
-    }
-    promo_applies = False
-    for method_path in frappe.get_hooks("apply_promotional_offer") or []:
+    method_path = None
+    hooks = frappe.get_hooks("apply_promotional_offer") or []
+    if hooks and len(hooks) > 0:
+        method_path = hooks[-1]
+    if method_path:
         try:
             method = frappe.get_attr(method_path)
         except Exception:
             frappe.log_error(
                 frappe.get_traceback(), "apply_promotional_offer hook import failure"
             )
-            continue
+            return None
         try:
             result = method(coupon_code=coupon_code, plans=plans, recurring=recurring)
             if result is None:
-                continue
+                return None
             else:
-                promo_applies = True
-                if return_result["value"] < result["value"]:
-                    return_result = result
+                return result
         except Exception:
             frappe.log_error(
                 frappe.get_traceback(), "apply_promotional_offer hook execution failure"
             )
-    if promo_applies:
-        return return_result
-    else:
-        return None
