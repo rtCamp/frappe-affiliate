@@ -131,11 +131,14 @@ class SubscriptionOverride(Subscription):
 
         invoice.flags.ignore_mandatory = True
 
-        subscription_current_first_cost = self.get("custom_first_cost", None)
         first_recurring_cost_set = (
-            True
-            if subscription_current_first_cost and subscription_current_first_cost > 0
-            else False
+            frappe.db.count(
+                "Sales Invoice",
+                {
+                    "subscription": self.name,
+                },
+            )
+            > 0
         )
 
         # Function had to be overridden to add custom coupon code here just before pricing rule related functions are executed.
