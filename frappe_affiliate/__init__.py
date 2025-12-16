@@ -1,7 +1,9 @@
 __version__ = "0.0.1"
 
 import frappe
+from erpnext.accounts.doctype.pricing_rule import pricing_rule  # nosemgrep
 from erpnext.accounts.doctype.pricing_rule import utils as utils  # nosemgrep
+from erpnext.stock import get_item_details  # nosemgrep
 from frappe import _
 from frappe.utils import getdate, today
 
@@ -10,6 +12,9 @@ def monkey_patch():
     # ToDo: Debug and analyse the root cause why in some instances original function is called instead of monkey patched one.
     # For now the specific call is patched here to prevent this from happening.
     utils.validate_coupon_code = validate_coupon_code  # nosemgrep
+    pricing_rule.apply_pricing_rule = apply_pricing_rule  # nosemgrep
+    pricing_rule.get_pricing_rule_for_item = get_pricing_rule_for_item  # nosemgrep
+    get_item_details.get_pricing_rule_for_item = get_pricing_rule_for_item  # nosemgrep
 
 
 def validate_coupon_code(coupon_name):
@@ -29,6 +34,14 @@ def validate_coupon_code(coupon_name):
         >= coupon.custom_subscription_maximum_use
     ):
         frappe.throw(_("Sorry, this coupon code is no longer valid"))
+
+
+def apply_pricing_rule(args, doc=None):
+    return []
+
+
+def get_pricing_rule_for_item(args, doc=None, for_validate=False):
+    return {}
 
 
 try:
