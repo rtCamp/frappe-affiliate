@@ -1,6 +1,6 @@
 import frappe
 from frappe import _ as translate
-from frappe.utils import getdate, nowdate
+from frappe.utils import cint, getdate, nowdate
 
 
 def update_coupon_code_count(coupon_code_doc, transaction_type):
@@ -69,38 +69,10 @@ def validate_coupon_code(
         return False
 
     if item:
-        pricing_rule = coupon_code_doc.get("pricing_rule")
-        apply_on_specific = frappe.get_all(
-            "Pricing Rule Item Code",
-            filters={
-                "parent": pricing_rule,
-                "parenttype": "Pricing Rule",
-                "parentfield": "items",
-            },
-        )
-        if apply_on_specific:
-            apply_on = frappe.get_all(
-                "Pricing Rule Item Code",
-                filters={
-                    "parent": pricing_rule,
-                    "parenttype": "Pricing Rule",
-                    "item_code": item,
-                    "parentfield": "items",
-                },
-            )
-            if not apply_on:
+        coupon_batch = coupon_code_doc.get("custom_coupon_batch", None)
+        if coupon_batch:
+            if not check_item_in_coupon_batch([item], coupon_batch):
                 return False
-        apply_except = frappe.get_all(
-            "Pricing Rule Item Code",
-            filters={
-                "parent": pricing_rule,
-                "parenttype": "Pricing Rule",
-                "item_code": item,
-                "parentfield": "custom_apply_except_item_code",
-            },
-        )
-        if apply_except:
-            return False
 
     if coupon_code_doc.custom_sales_partner:
         affiliate_banned = frappe.db.get_value(
@@ -113,3 +85,129 @@ def validate_coupon_code(
             return False
 
     return True
+
+
+def check_item_in_coupon_batch(item_list, coupon_batch):
+    apply_on_specific = frappe.get_all(
+        "Pricing Rule Item Code",
+        filters={
+            "parent": coupon_batch,
+            "parenttype": "Coupon Batch",
+            "parentfield": "apply_on_item_code",
+        },
+        fields=["item_code"],
+        pluck="item_code",
+    )
+    if apply_on_specific and apply_on_specific != []:
+        apply_on_specific = [cint(item_code) for item_code in apply_on_specific]
+        applies = set(item_list).issubset(apply_on_specific)
+        if not applies:
+            return False
+    apply_except = frappe.get_all(
+        "Pricing Rule Item Code",
+        filters={
+            "parent": coupon_batch,
+            "parenttype": "Coupon Batch",
+            "item_code": ["in", item_list],
+            "parentfield": "apply_except_item_code",
+        },
+    )
+    if apply_except and apply_except != []:
+        return False
+    return True
+
+
+def get_first_recurring_discount(coupon_code, recurring=False, plans=None):
+    result = {
+        "type": None,
+        "value": 0.0,
+    }
+
+    promotional_offer = _apply_promotional_offer_hooks(
+        coupon_code, plans=plans, recurring=recurring
+    )
+    if promotional_offer:
+        return promotional_offer
+
+    if not coupon_code:
+        return result
+
+    coupon_batch = frappe.get_value("Coupon Code", coupon_code, "custom_coupon_batch")
+
+    if not coupon_batch:
+        return result
+
+    coupon_batch_values = frappe.db.get_value(
+        "Coupon Batch",
+        coupon_batch,
+        [
+            "rate_or_discount",
+            "discount",
+            "recurring_rate_or_discount",
+            "recurring_discount",
+            "apply_to_recurring",
+        ],
+        as_dict=True,
+    )
+
+    if not coupon_batch_values:
+        return result
+    if recurring and not coupon_batch_values.get("apply_to_recurring"):
+        return result
+
+    recurring_string = "recurring_" if recurring else ""
+
+    result["type"] = coupon_batch_values.get(f"{recurring_string}rate_or_discount")
+    result["value"] = coupon_batch_values.get(f"{recurring_string}discount") or 0.0
+    return result
+
+
+def _apply_promotional_offer_hooks(coupon_code, plans=None, recurring=False):
+    """
+    Allow other apps to hook into and modify the coupon discount logic via the
+    'apply_promotional_offer' hook.
+
+    Each hook method should return discount details as a dict with keys:
+      - type: either "Percentage" or "Amount"
+      - value: the discount value as a float
+      - recurring: bool indicating if the discount is for recurring charges
+    By default the last hook will be applied.
+
+    Example (in another app's hooks.py):
+        apply_promotional_offer = [
+            "my_app.promo_hooks.apply_summer_sale_discount",
+        ]
+
+    Example hook implementation:
+        def apply_summer_sale_discount(coupon_code, plans=None):
+            return {
+                "type": "Percentage",
+                "value": 20.0
+            }
+
+    Params:
+        coupon_code (str): The coupon code to evaluate.
+        plans (list, optional): List of plans to check for promotions. Defaults to None.
+    """
+    method_path = None
+    hooks = frappe.get_hooks("apply_promotional_offer") or []
+    if hooks and len(hooks) > 0:
+        method_path = hooks[-1]
+    if method_path:
+        try:
+            method = frappe.get_attr(method_path)
+        except Exception:
+            frappe.log_error(
+                frappe.get_traceback(), "apply_promotional_offer hook import failure"
+            )
+            return None
+        try:
+            result = method(coupon_code=coupon_code, plans=plans, recurring=recurring)
+            if result is None:
+                return None
+            else:
+                return result
+        except Exception:
+            frappe.log_error(
+                frappe.get_traceback(), "apply_promotional_offer hook execution failure"
+            )
