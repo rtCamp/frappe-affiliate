@@ -1,4 +1,5 @@
 import frappe
+from frappe import _
 from frappe.utils import (
     add_months,
     cint,
@@ -141,9 +142,7 @@ def get_period_statistics(start_date, end_date):
 
 
 @frappe.whitelist(methods=["GET"])
-def get_click_log_for_statistic(
-    date: str | None = None, by_month=1, start: int = 0, limit: int = 20
-) -> list:
+def get_click_log_for_statistic(date=None, by_month=1, start=0, limit=20) -> dict:
     """
     Get click log entries for a specific date
 
@@ -170,16 +169,25 @@ def get_click_log_for_statistic(
             "start": 0,
             "limit": 20
         }
-    },
+    }
     """
     by_month = cint(by_month)
+    limit = max(1, cint(limit))
+    start = max(0, cint(start))
 
     sales_partner = frappe.db.get_value(
         "Sales Partner", {"custom_user": frappe.session.user}, "name"
     )
 
+    result = {
+        "click_logs": [],
+        "total": 0,
+        "start": start,
+        "limit": limit,
+    }
+
     if not sales_partner:
-        return []
+        return result
 
     try:
         if by_month:
@@ -188,8 +196,8 @@ def get_click_log_for_statistic(
             end_date = get_last_day(start_date)
         else:
             start_date = end_date = getdate(date)
-    except (ValueError, AttributeError):
-        return {"error": "Invalid date format."}
+    except (ValueError, AttributeError, TypeError):
+        frappe.throw(_("Invalid date format."))
 
     start_datetime = frappe.utils.get_datetime(start_date)
     end_datetime = frappe.utils.get_datetime(end_date).replace(
@@ -215,9 +223,7 @@ def get_click_log_for_statistic(
         filters=filters,
     )
 
-    return {
-        "click_logs": click_logs,
-        "total": total_clicks,
-        "start": start,
-        "limit": limit,
-    }
+    result["click_logs"] = click_logs
+    result["total"] = total_clicks
+
+    return result
