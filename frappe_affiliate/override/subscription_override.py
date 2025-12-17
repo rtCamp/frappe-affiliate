@@ -12,6 +12,10 @@ from frappe.utils.data import (
     cint,
 )
 
+from frappe_affiliate.utils.coupon_code import (
+    get_first_recurring_discount,
+)
+
 DateTimeLikeObject = str | date
 
 
@@ -127,13 +131,72 @@ class SubscriptionOverride(Subscription):
 
         invoice.flags.ignore_mandatory = True
 
+        first_recurring_cost_set = (
+            frappe.db.count(
+                "Sales Invoice",
+                {
+                    "subscription": self.name,
+                },
+            )
+            > 0
+        )
+
         # Function had to be overridden to add custom coupon code here just before pricing rule related functions are executed.
         if self.get("custom_coupon_code", None):
             invoice.coupon_code = self.custom_coupon_code
+            if not first_recurring_cost_set:
+                first_discount = get_first_recurring_discount(
+                    invoice.coupon_code, recurring=False, plans=self.plans
+                )
+                if first_discount["type"] == "Percentage":
+                    invoice.additional_discount_percentage = (
+                        (
+                            invoice.additional_discount_percentage
+                            + first_discount["value"]
+                        )
+                        if invoice.additional_discount_percentage
+                        else first_discount["value"]
+                    )
+                elif first_discount["type"] == "Amount":
+                    invoice.discount_amount = (
+                        (invoice.discount_amount + first_discount["value"])
+                        if invoice.discount_amount
+                        else first_discount["value"]
+                    )
+                invoice.apply_discount_on = "Net Total"
 
         invoice.set_missing_values()
 
         invoice.save()
+
+        invoice.reload()
+
+        net_total = invoice.total
+
+        if self.get("custom_coupon_code", None) and not first_recurring_cost_set:
+            first_cost = invoice.net_total
+            recurring_cost = calculate_recurring_cost(
+                invoice.coupon_code, self.plans, net_total
+            )
+            frappe.db.set_value(
+                "Subscription",
+                self.name,
+                {
+                    "custom_first_cost": first_cost,
+                    "custom_recurring_cost": recurring_cost,
+                },
+            )
+            self.reload()
+        elif not first_recurring_cost_set:
+            frappe.db.set_value(
+                "Subscription",
+                self.name,
+                {
+                    "custom_first_cost": net_total,
+                    "custom_recurring_cost": net_total,
+                },
+            )
+            self.reload()
 
         if self.submit_invoice:
             invoice.submit()
@@ -145,3 +208,81 @@ class SubscriptionOverride(Subscription):
         Returns `True` if the `Subscription` is in trial period.
         """
         return not self.period_has_passed(self.trial_period_end)
+
+
+def calculate_recurring_cost(coupon_code, plans, net_total):
+    recurring_discount = get_first_recurring_discount(
+        coupon_code, recurring=True, plans=plans
+    )
+    recurring_override = _apply_recurring_discount_hooks(
+        coupon_code=coupon_code,
+        recurring_discount=recurring_discount,
+        plans=plans,
+        net_total=net_total,
+    )
+    if recurring_override is not None:
+        return recurring_override
+
+    if recurring_discount["type"] == "Percentage":
+        discount_value = (recurring_discount["value"] / 100) * net_total
+    elif recurring_discount["type"] == "Amount":
+        discount_value = recurring_discount["value"]
+    else:
+        discount_value = 0.0
+    recurring_cost = net_total - discount_value
+    return max(0, min(recurring_cost, net_total))
+
+
+def _apply_recurring_discount_hooks(
+    coupon_code, recurring_discount, plans, net_total=0.0
+):
+    """
+    Allow other apps to hook into and modify the recurring discount logic via the
+    'recurring_discount_override' hook.
+
+    Each hook method should return discounted amount as a float.:
+
+    Example (in another app's hooks.py):
+        recurring_discount_override = [
+            "my_app.promo_hooks.apply_summer_sale_discount",
+        ]
+
+    Example hook implementation:
+        def apply_summer_sale_discount(coupon_code, plans, net_total=0.0):
+            return 20.0
+
+    Params:
+        coupon_code (str): The coupon code to evaluate.
+        recurring_discount (dict): The recurring discount details.
+        plans (list): List of plans to check for promotions.
+        net_total (float, optional): net amount before taxation on first invoice. Defaults to 0.0.
+    """
+    hooks = frappe.get_hooks("recurring_discount_override") or []
+    method_path = None
+    if hooks and len(hooks) > 0:
+        method_path = hooks[-1]
+    if method_path:
+        try:
+            method = frappe.get_attr(method_path)
+        except Exception:
+            frappe.log_error(
+                frappe.get_traceback(),
+                "recurring_discount_override hook import failure",
+            )
+            return None
+        try:
+            result = method(
+                coupon_code=coupon_code,
+                recurring_discount=recurring_discount,
+                plans=plans,
+                net_total=net_total,
+            )
+            if result is None:
+                return None
+            else:
+                return result
+        except Exception:
+            frappe.log_error(
+                frappe.get_traceback(),
+                "recurring_discount_override hook execution failure",
+            )

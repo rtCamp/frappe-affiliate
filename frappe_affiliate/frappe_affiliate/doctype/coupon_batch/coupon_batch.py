@@ -37,8 +37,6 @@ class CouponBatch(Document):
                 "custom_sales_partner": self.sales_partner,
                 "coupon_type": "Promotional",
                 "custom_apply_to_recurring": self.apply_to_recurring,
-                "pricing_rule": self.pricing_rule,
-                "custom_recurring_pricing_rule": self.recurring_pricing_rule,
                 "valid_from": self.valid_from,
                 "valid_upto": self.valid_upto,
                 "maximum_use": self.maximum_use,
@@ -67,8 +65,6 @@ class CouponBatch(Document):
             coupon = frappe.get_doc("Coupon Code", coupon_name)
             coupon.custom_apply_to_recurring = self.apply_to_recurring
             coupon.custom_sales_partner = self.sales_partner
-            coupon.custom_pricing_rule = self.pricing_rule
-            coupon.custom_recurring_pricing_rule = self.recurring_pricing_rule
             coupon.custom_subscription_maximum_use = self.subscription_maximum_use
             coupon.valid_from = self.valid_from
             coupon.valid_upto = self.valid_upto
