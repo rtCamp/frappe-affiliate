@@ -1,5 +1,6 @@
 import frappe
 from frappe import _ as translate
+
 from frappe_affiliate.utils.coupon_code import (
     validate_coupon_code,
 )
