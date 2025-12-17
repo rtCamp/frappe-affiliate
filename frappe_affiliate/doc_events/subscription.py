@@ -2,7 +2,6 @@ import frappe
 from frappe import _ as translate
 
 from frappe_affiliate.utils.coupon_code import (
-    update_coupon_code_count,
     validate_coupon_code,
 )
 
@@ -37,6 +36,3 @@ def validate(doc, method=None):
                     )
                 )
                 return
-
-        if doc.is_new():
-            update_coupon_code_count(coupon_code_doc, "used")
