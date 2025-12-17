@@ -46,9 +46,9 @@
   },
   {
    "fieldname": "apply_on_group",
-   "fieldtype": "Link",
+   "fieldtype": "Table",
    "label": "Apply on Group",
-   "options": "User Group"
+   "options": "Referral User Group"
   },
   {
    "fieldname": "apply_on_item_code",
