@@ -1,6 +1,9 @@
 import frappe
 
 from frappe_affiliate.api.referral_fee_rule import get_referral_fee_rule_for_tier
+from frappe_affiliate.utils.coupon_code import (
+    update_coupon_code_count,
+)
 
 
 def on_submit(doc, method=None):
@@ -21,6 +24,11 @@ def on_submit(doc, method=None):
         and sales_invoice_doc.total_commission > 0
     ):
         record_referral(sales_invoice_doc, doc)
+
+    sales_invoice_count = sales_invoice_doc.custom_apex_public_id.split("/")[-1]
+    if sales_invoice_count == "1" and sales_invoice_doc.coupon_code:
+        coupon_code_doc = frappe.get_doc("Coupon Code", sales_invoice_doc.coupon_code)
+        update_coupon_code_count(coupon_code_doc, "used")
 
 
 def record_referral(sales_invoice_doc, payment_entry_doc):
