@@ -117,6 +117,28 @@ def check_item_in_coupon_batch(item_list, coupon_batch):
     return True
 
 
+def calculate_higher_discount(discount, promo_offer, price):
+    if not promo_offer:
+        return discount
+
+    promo_discount_value = None
+    normal_discount_value = None
+
+    if promo_offer["type"] == "Percentage":
+        promo_discount_value = (promo_offer["value"] / 100) * price
+    elif promo_offer["type"] == "Amount":
+        promo_discount_value = promo_offer["value"]
+
+    if discount["type"] == "Percentage":
+        normal_discount_value = (discount["value"] / 100) * price
+    elif discount["type"] == "Amount":
+        normal_discount_value = discount["value"]
+
+    if promo_discount_value > normal_discount_value:
+        return promo_offer
+    return discount
+
+
 def get_first_recurring_discount(coupon_code, recurring=False, plans=None):
     result = {
         "type": None,
@@ -126,16 +148,14 @@ def get_first_recurring_discount(coupon_code, recurring=False, plans=None):
     promotional_offer = _apply_promotional_offer_hooks(
         coupon_code, plans=plans, recurring=recurring
     )
-    if promotional_offer:
-        return promotional_offer
 
     if not coupon_code:
-        return result
+        return result, None
 
     coupon_batch = frappe.get_value("Coupon Code", coupon_code, "custom_coupon_batch")
 
     if not coupon_batch:
-        return result
+        return result, None
 
     coupon_batch_values = frappe.db.get_value(
         "Coupon Batch",
@@ -151,15 +171,15 @@ def get_first_recurring_discount(coupon_code, recurring=False, plans=None):
     )
 
     if not coupon_batch_values:
-        return result
+        return result, None
     if recurring and not coupon_batch_values.get("apply_to_recurring"):
-        return result
+        return result, None
 
     recurring_string = "recurring_" if recurring else ""
 
     result["type"] = coupon_batch_values.get(f"{recurring_string}rate_or_discount")
     result["value"] = coupon_batch_values.get(f"{recurring_string}discount") or 0.0
-    return result
+    return result, promotional_offer
 
 
 def _apply_promotional_offer_hooks(coupon_code, plans=None, recurring=False):

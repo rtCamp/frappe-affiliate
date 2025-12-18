@@ -13,6 +13,7 @@ from frappe.utils.data import (
 )
 
 from frappe_affiliate.utils.coupon_code import (
+    calculate_higher_discount,
     get_first_recurring_discount,
 )
 
@@ -145,23 +146,29 @@ class SubscriptionOverride(Subscription):
         if self.get("custom_coupon_code", None):
             invoice.coupon_code = self.custom_coupon_code
             if not first_recurring_cost_set:
-                first_discount = get_first_recurring_discount(
+                first_discount, promo_discount = get_first_recurring_discount(
                     invoice.coupon_code, recurring=False, plans=self.plans
                 )
-                if first_discount["type"] == "Percentage":
+                calculated_total = 0.0
+                for individual_item in items_list:
+                    calculated_total += individual_item.get("rate", 0.0)
+                discount_values = calculate_higher_discount(
+                    first_discount, promo_discount, calculated_total
+                )
+                if discount_values["type"] == "Percentage":
                     invoice.additional_discount_percentage = (
                         (
                             invoice.additional_discount_percentage
-                            + first_discount["value"]
+                            + discount_values["value"]
                         )
                         if invoice.additional_discount_percentage
-                        else first_discount["value"]
+                        else discount_values["value"]
                     )
-                elif first_discount["type"] == "Amount":
+                elif discount_values["type"] == "Amount":
                     invoice.discount_amount = (
-                        (invoice.discount_amount + first_discount["value"])
+                        (invoice.discount_amount + discount_values["value"])
                         if invoice.discount_amount
-                        else first_discount["value"]
+                        else discount_values["value"]
                     )
                 invoice.apply_discount_on = "Net Total"
 
@@ -211,12 +218,13 @@ class SubscriptionOverride(Subscription):
 
 
 def calculate_recurring_cost(coupon_code, plans, net_total):
-    recurring_discount = get_first_recurring_discount(
+    recurring_discount, promo_discount = get_first_recurring_discount(
         coupon_code, recurring=True, plans=plans
     )
     recurring_override = _apply_recurring_discount_hooks(
         coupon_code=coupon_code,
         recurring_discount=recurring_discount,
+        promo_discount=promo_discount,
         plans=plans,
         net_total=net_total,
     )
@@ -234,7 +242,7 @@ def calculate_recurring_cost(coupon_code, plans, net_total):
 
 
 def _apply_recurring_discount_hooks(
-    coupon_code, recurring_discount, plans, net_total=0.0
+    coupon_code, recurring_discount, promo_discount, plans, net_total=0.0
 ):
     """
     Allow other apps to hook into and modify the recurring discount logic via the
@@ -248,12 +256,13 @@ def _apply_recurring_discount_hooks(
         ]
 
     Example hook implementation:
-        def apply_summer_sale_discount(coupon_code, plans, net_total=0.0):
+        def apply_summer_sale_discount(coupon_code, recurring_discount, promo_discount, plans, net_total=0.0):
             return 20.0
 
     Params:
         coupon_code (str): The coupon code to evaluate.
         recurring_discount (dict): The recurring discount details.
+        promo_discount (dict): Promotional discount details, if any.
         plans (list): List of plans to check for promotions.
         net_total (float, optional): net amount before taxation on first invoice. Defaults to 0.0.
     """
@@ -274,6 +283,7 @@ def _apply_recurring_discount_hooks(
             result = method(
                 coupon_code=coupon_code,
                 recurring_discount=recurring_discount,
+                promo_discount=promo_discount,
                 plans=plans,
                 net_total=net_total,
             )
