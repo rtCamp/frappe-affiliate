@@ -1,6 +1,6 @@
 {
  "actions": [],
- "autoname": "autoincrement",
+ "autoname": "hash",
  "creation": "2025-09-25 03:06:31.864861",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -83,7 +83,7 @@
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Referral",
- "naming_rule": "Autoincrement",
+ "naming_rule": "Random",
  "owner": "Administrator",
  "permissions": [
   {
