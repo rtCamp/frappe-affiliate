@@ -78,7 +78,7 @@ def get_affiliate_keywords(
     referral_on_conditions = [
         Referral.keyword == AffiliateKeyword.name,
         Referral.sales_partner == sales_partner,
-        Referral.record_type == "commission",
+        Referral.record_type == "referral",
         Referral.void == 0,
     ]
     if date_from:
