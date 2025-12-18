@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "autoincrement",
+ "autoname": "hash",
  "creation": "2025-09-14 22:59:08.704434",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -25,11 +25,11 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-22 13:17:53.194955",
+ "modified": "2025-11-15 10:58:44.477139",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Keyword",
- "naming_rule": "Autoincrement",
+ "naming_rule": "Random",
  "owner": "Administrator",
  "permissions": [
   {

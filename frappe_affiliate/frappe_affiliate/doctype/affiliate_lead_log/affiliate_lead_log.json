@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "autoincrement",
+ "autoname": "hash",
  "creation": "2025-10-06 12:41:40.681856",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -57,18 +57,18 @@
   },
   {
    "fieldname": "referrer",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Referrer"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-06 12:52:44.423195",
+ "modified": "2025-11-15 12:29:07.637124",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Lead Log",
- "naming_rule": "Autoincrement",
+ "naming_rule": "Random",
  "owner": "Administrator",
  "permissions": [
   {
