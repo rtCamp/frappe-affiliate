@@ -1,6 +1,6 @@
 import frappe
 from frappe import _ as translate
-from frappe.utils import cint, getdate, nowdate
+from frappe.utils import getdate, nowdate
 
 
 def update_coupon_code_count(coupon_code_doc, transaction_type):
@@ -105,7 +105,6 @@ def check_item_in_coupon_batch(item_list, coupon_batch):
         pluck="item_code",
     )
     if apply_on_specific and apply_on_specific != []:
-        apply_on_specific = [cint(item_code) for item_code in apply_on_specific]
         applies = set(item_list).issubset(apply_on_specific)
         if not applies:
             return False
