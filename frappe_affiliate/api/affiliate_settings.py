@@ -138,3 +138,15 @@ def update_banner_and_text_link(banner_id, **kwargs):
                 return {"success": True, "message": "Banner updated successfully"}
 
         return {"success": False, "message": "Banner not found"}
+
+
+def get_affiliate_marketing_materials():
+    marketing_materials = frappe.get_all(
+        "Affiliate Marketing Material",
+        fields=["name", "material", "description"],
+    )
+
+    for material in marketing_materials:
+        material["material_url"] = frappe.utils.get_url(material["material"])
+        material["material_name"] = material["material"].split("/")[-1]
+    return marketing_materials
