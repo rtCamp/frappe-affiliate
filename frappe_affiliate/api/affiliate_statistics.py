@@ -102,6 +102,7 @@ def get_daily_statistics(month):
 
     data = {
         "data": daily_data,
+        "total": len(daily_data),
     }
     return data
 
