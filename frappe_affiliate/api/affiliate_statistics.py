@@ -3,6 +3,7 @@ from frappe.utils import (
     add_months,
     cint,
     formatdate,
+    get_datetime,
     get_first_day,
     get_last_day,
     getdate,
@@ -10,12 +11,14 @@ from frappe.utils import (
 
 
 @frappe.whitelist()
-def get_affiliate_statistics(by_month=0, month=None):
+def get_affiliate_statistics(by_month=0, month=None, start=0, limit=20):
     affiliate_join = frappe.db.get_value(
         "Sales Partner", {"custom_user": frappe.session.user}, "creation"
     )
 
     by_month = cint(by_month)
+    start = cint(start)
+    limit = cint(limit)
 
     if not affiliate_join:
         return {"error": "No affiliate record found for current user"}
@@ -23,20 +26,32 @@ def get_affiliate_statistics(by_month=0, month=None):
     if by_month and month:
         return get_daily_statistics(month)
     else:
-        return get_monthly_statistics(affiliate_join)
+        # The start and limit parameters are based on months and only used when by_month
+        return get_monthly_statistics(affiliate_join, start, limit)
 
 
-def get_monthly_statistics(affiliate_join):
+def get_monthly_statistics(affiliate_join, start, limit):
     """Get affiliate statistics grouped by month"""
     current_date = getdate()
-    start_date = (
-        get_first_day(affiliate_join) if affiliate_join else get_first_day(current_date)
+    affiliate_join_date = get_datetime(affiliate_join)
+    affiliate_join_date = (
+        get_first_day(affiliate_join_date)
+        if affiliate_join_date
+        else get_first_day(current_date)
     )
+
+    start_date = add_months(current_date, -start)
+    end_date = add_months(start_date, -limit)
+
+    if end_date < affiliate_join_date:
+        end_date = affiliate_join_date
+    if start_date < affiliate_join_date:
+        start_date = affiliate_join_date
 
     monthly_data = []
 
     current_month = start_date
-    while current_month <= current_date:
+    while current_month >= end_date:
         month_start = get_first_day(current_month)
         month_end = get_last_day(current_month)
 
@@ -46,7 +61,7 @@ def get_monthly_statistics(affiliate_join):
 
         monthly_data.append(stats)
 
-        current_month = add_months(current_month, 1)
+        current_month = add_months(current_month, -1)
 
     return monthly_data
 
@@ -106,7 +121,7 @@ def get_period_statistics(start_date, end_date):
         filters={
             "sales_partner": sales_partner,
             "record_type": "commission",
-            "creation": ["between", [start_datetime, end_datetime]],
+            "date": ["between", [start_datetime, end_datetime]],
             "void": 0,
         },
         fields="amount",
@@ -119,14 +134,14 @@ def get_period_statistics(start_date, end_date):
         "Affiliate Click Log",
         filters={
             "sales_partner": sales_partner,
-            "creation": ["between", [start_datetime, end_datetime]],
+            "time": ["between", [start_datetime, end_datetime]],
         },
     )
     unique_clicks_count = frappe.get_all(
         "Affiliate Click Log",
         filters={
             "sales_partner": sales_partner,
-            "creation": ["between", [start_datetime, end_datetime]],
+            "time": ["between", [start_datetime, end_datetime]],
         },
         fields=["remote_address"],
         group_by="remote_address",
