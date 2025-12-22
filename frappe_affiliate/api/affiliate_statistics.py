@@ -64,7 +64,7 @@ def get_monthly_statistics(affiliate_join, start, limit):
         current_month = add_months(current_month, -1)
 
     data = {
-        "monthly_data": monthly_data,
+        "data": monthly_data,
         "start": start,
         "limit": limit,
         "total": (current_date.year - affiliate_join_date.year) * 12
@@ -100,7 +100,10 @@ def get_daily_statistics(month):
 
         current_day = frappe.utils.add_days(current_day, 1)
 
-    return daily_data
+    data = {
+        "data": daily_data,
+    }
+    return data
 
 
 def get_period_statistics(start_date, end_date):
