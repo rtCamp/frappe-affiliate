@@ -63,7 +63,14 @@ def get_monthly_statistics(affiliate_join, start, limit):
 
         current_month = add_months(current_month, -1)
 
-    return monthly_data
+    data = {
+        "monthly_data": monthly_data,
+        "start": start,
+        "limit": limit,
+        "total": (current_date.year - affiliate_join_date.year) * 12
+        + (current_date.month - affiliate_join_date.month),
+    }
+    return data
 
 
 def get_daily_statistics(month):
