@@ -32,6 +32,7 @@ def on_submit(doc, method=None):
 
 
 def record_referral(sales_invoice_doc, payment_entry_doc):
+    keyword = get_keyword_for_referral()
     referral = frappe.get_doc(
         {
             "doctype": "Affiliate Referral",
@@ -42,7 +43,12 @@ def record_referral(sales_invoice_doc, payment_entry_doc):
             "record_type": "commission",
             "tier": 0,
         }
-    ).save()
+    )
+
+    if keyword:
+        referral.keyword = keyword
+
+    referral.save()
 
     if frappe.get_single_value("Affiliate Settings", "enable_tier_2"):
         referral_2 = record_referral_tiers(
@@ -117,3 +123,22 @@ def record_referral_tiers(referral, invoice, payment_entry, tier):
     ).save()
 
     return new_referral
+
+
+def get_keyword_for_referral():
+    aff_cookie = frappe.local.request.cookies.get("affiliate_id")
+    if not aff_cookie:
+        return
+
+    aff_cookie_parts = aff_cookie.split("-")
+    aff_cookie_len = len(aff_cookie_parts)
+    if aff_cookie_len < 2:
+        return
+
+    click_log = frappe.db.exists("Affiliate Click Log", aff_cookie_parts[-1])
+
+    if not click_log:
+        return
+
+    keyword = frappe.db.get_value("Affiliate Click Log", click_log, "keyword")
+    return keyword
