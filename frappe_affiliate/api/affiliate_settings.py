@@ -147,6 +147,11 @@ def get_affiliate_marketing_materials():
     )
 
     for material in marketing_materials:
-        material["material_url"] = frappe.utils.get_url(material["material"])
-        material["material_name"] = material["material"].split("/")[-1]
+        path = material.get("material")
+        if path:
+            material["material_url"] = frappe.utils.get_url(path)
+            material["material_name"] = path.split("/")[-1]
+        else:
+            material["material_url"] = None
+            material["material_name"] = ""
     return marketing_materials
