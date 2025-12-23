@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 import frappe
 from frappe import local
 from werkzeug.exceptions import HTTPException
@@ -180,6 +182,17 @@ def check_banner_embed(banner_text_link_route_path):
 
 
 def redirect_affiliate_link(redirect_url, response):
+    # add all current params to the redirect url
+    args = local.request.args
+    args = {
+        key: value for key, value in args.items() if key not in ["banner", "keyword"]
+    }
+    if args:
+        query_string = urlencode(args)
+        if "?" in redirect_url:
+            redirect_url += "&" + query_string
+        else:
+            redirect_url += "?" + query_string
     response.headers["Location"] = redirect_url
     response.status_code = 302
     raise HTTPException(response=response)
