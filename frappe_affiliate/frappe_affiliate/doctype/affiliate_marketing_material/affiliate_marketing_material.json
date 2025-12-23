@@ -17,7 +17,7 @@
   {
    "fieldname": "material",
    "fieldtype": "Attach",
-   "label": "material"
+   "label": "Material"
   }
  ],
  "grid_page_length": 50,
