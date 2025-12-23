@@ -85,10 +85,4 @@ def apply_referral_fee_rules(doc):
             )
         doc.custom_affiliate_referral_fee_rule = referral_fee_rule.name
 
-    if not referral_fee_rate:
-        referral_fee_rate = (
-            frappe.db.get_value("Sales Partner", doc.sales_partner, "commission_rate")
-            or 0
-        )
-
     return referral_fee_rate

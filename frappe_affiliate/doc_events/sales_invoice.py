@@ -38,5 +38,9 @@ def validate(doc, method=None):
             doc.sales_partner = None
             doc.commission_rate = None
             return
-        doc.commission_rate = apply_referral_fee_rules(doc)
+        referral_fee_rate = apply_referral_fee_rules(doc)
+        # In case there is no applicable referral fee rule, reset sales partner
+        if not referral_fee_rate:
+            doc.sales_partner = None
+        doc.commission_rate = referral_fee_rate
         doc.calculate_commission()
