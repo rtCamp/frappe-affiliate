@@ -50,6 +50,13 @@ def get_monthly_statistics(affiliate_join, start, limit):
 
     monthly_data = []
 
+    total_dict = {
+        "transactions": 0,
+        "referral_fee_earned": 0.0,
+        "clicks": 0,
+        "unique_clicks": 0,
+    }
+
     current_month = start_date
     while current_month >= end_date:
         month_start = get_first_day(current_month)
@@ -61,10 +68,14 @@ def get_monthly_statistics(affiliate_join, start, limit):
 
         monthly_data.append(stats)
 
+        for key, value in total_dict.items():
+            total_dict[key] = value + stats[key]
+
         current_month = add_months(current_month, -1)
 
     data = {
         "data": monthly_data,
+        "values_total": total_dict,
         "start": start,
         "limit": limit,
         "total": (current_date.year - affiliate_join_date.year) * 12
@@ -90,6 +101,13 @@ def get_daily_statistics(month):
 
     daily_data = []
 
+    total_dict = {
+        "transactions": 0,
+        "referral_fee_earned": 0.0,
+        "clicks": 0,
+        "unique_clicks": 0,
+    }
+
     current_day = month_start
     while current_day <= month_end:
         stats = get_period_statistics(current_day, current_day)
@@ -98,10 +116,14 @@ def get_daily_statistics(month):
 
         daily_data.append(stats)
 
+        for key, value in total_dict.items():
+            total_dict[key] = value + stats[key]
+
         current_day = frappe.utils.add_days(current_day, 1)
 
     data = {
         "data": daily_data,
+        "values_total": total_dict,
         "total": len(daily_data),
     }
     return data
