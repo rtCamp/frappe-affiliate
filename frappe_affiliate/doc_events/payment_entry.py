@@ -126,7 +126,11 @@ def record_referral_tiers(referral, invoice, payment_entry, tier):
 
 
 def get_keyword_for_referral():
-    aff_cookie = frappe.local.request.cookies.get("affiliate_id")
+    request = getattr(frappe.local, "request", None)
+    if not request or not hasattr(request, "cookies"):
+        return
+
+    aff_cookie = request.cookies.get("affiliate_id")
     if not aff_cookie:
         return
 
