@@ -106,7 +106,7 @@ def get_period_statistics(start_date, end_date):
         "Affiliate Referral",
         filters={
             "sales_partner": sales_partner,
-            "record_type": "commission",
+            "record_type": "referral",
             "creation": ["between", [start_datetime, end_datetime]],
             "void": 0,
         },

@@ -20,7 +20,7 @@ class AffiliateReferral(Document):
         linked_referrals = frappe.get_all(
             "Affiliate Referral",
             filters={
-                "record_type": "commission",
+                "record_type": "referral",
                 "void": 0,
                 "payment_entry": self.payment_entry,
             },
