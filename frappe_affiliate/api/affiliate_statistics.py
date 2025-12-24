@@ -27,7 +27,7 @@ def get_affiliate_statistics(by_month=0, month=None, start=0, limit=20):
     if by_month and month:
         return get_daily_statistics(month)
     else:
-        # The start and limit parameters are based on months and only used when by_month
+        # The start and limit parameters are based on months and only used when not by_month (monthly statistics pagination)
         return get_monthly_statistics(affiliate_join, start, limit)
 
 
