@@ -131,8 +131,7 @@ def get_keyword_for_referral():
         return
 
     aff_cookie_parts = aff_cookie.split("-")
-    aff_cookie_len = len(aff_cookie_parts)
-    if aff_cookie_len < 2:
+    if len(aff_cookie_parts) < 2:
         return
 
     click_log = frappe.db.exists("Affiliate Click Log", aff_cookie_parts[-1])
