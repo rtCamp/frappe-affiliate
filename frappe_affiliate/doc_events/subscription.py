@@ -19,6 +19,17 @@ def validate(doc, method=None):
         if not coupon_code_valid:
             frappe.throw(translate("Invalid coupon code"))
 
+        if coupon_code_doc.custom_sales_partner:
+            sales_partner_customer = frappe.db.get_value(
+                "Sales Partner", coupon_code_doc.custom_sales_partner, "custom_customer"
+            )
+            if doc.party == sales_partner_customer:
+                frappe.throw(
+                    translate(
+                        "Cannot use coupon code assigned to your own affiliate account."
+                    )
+                )
+
         coupon_user_use_count = coupon_code_doc.get("custom_maximum_user_use_count", 0)
         if coupon_user_use_count > 0:
             user_use_count = frappe.db.count(
