@@ -39,7 +39,7 @@ def record_referral(sales_invoice_doc, payment_entry_doc):
             "payment_entry": payment_entry_doc.name,
             "amount": sales_invoice_doc.total_commission,
             "date": payment_entry_doc.posting_date,
-            "record_type": "commission",
+            "record_type": "referral",
             "tier": 0,
         }
     ).save()
@@ -111,7 +111,7 @@ def record_referral_tiers(referral, invoice, payment_entry, tier):
             "payment_entry": payment_entry,
             "amount": (referral.amount / 100) * tier_referral_fee_rate,
             "date": referral.date,
-            "record_type": "commission",
+            "record_type": "referral",
             "tier": tier - 1,
         }
     ).save()

@@ -1,4 +1,5 @@
 import frappe
+from frappe import _
 from frappe.utils import (
     add_months,
     cint,
@@ -153,7 +154,7 @@ def get_period_statistics(start_date, end_date):
         "Affiliate Referral",
         filters={
             "sales_partner": sales_partner,
-            "record_type": "commission",
+            "record_type": "referral",
             "date": ["between", [start_datetime, end_datetime]],
             "void": 0,
         },
@@ -186,3 +187,91 @@ def get_period_statistics(start_date, end_date):
         "clicks": clicks_count or 0,
         "unique_clicks": len(unique_clicks_count) or 0,
     }
+
+
+@frappe.whitelist(methods=["GET"])
+def get_click_log_for_statistic(date=None, by_month=1, start=0, limit=20) -> dict:
+    """
+    Get click log entries for a specific date
+
+    Params:
+    - date (str): The date or month for which to retrieve click logs.
+    - by_month (int): If 1, date is treated as month (YYYY-MM); if 0, as specific date (YYYY-MM-DD).
+    - start (int): The starting index for pagination.
+    - limit (int): The number of records to retrieve.
+
+    Response:
+        {
+        "message": {
+            "click_logs": [
+                {
+                    "time": "2025-11-25 10:52:27",
+                    "referrer": null
+                },
+                {
+                    "time": "2025-11-25 10:52:27",
+                    "referrer": "https://www.google.com"
+                }
+            ],
+            "total": 2,
+            "start": 0,
+            "limit": 20
+        }
+    }
+    """
+    by_month = cint(by_month)
+    limit = max(1, cint(limit))
+    start = max(0, cint(start))
+
+    sales_partner = frappe.db.get_value(
+        "Sales Partner", {"custom_user": frappe.session.user}, "name"
+    )
+
+    result = {
+        "click_logs": [],
+        "total": 0,
+        "start": start,
+        "limit": limit,
+    }
+
+    if not sales_partner:
+        return result
+
+    try:
+        if by_month:
+            modified_date = date + "-01"
+            start_date = get_first_day(modified_date)
+            end_date = get_last_day(start_date)
+        else:
+            start_date = end_date = getdate(date)
+    except (ValueError, AttributeError, TypeError):
+        frappe.throw(_("Invalid date format."))
+
+    start_datetime = frappe.utils.get_datetime(start_date)
+    end_datetime = frappe.utils.get_datetime(end_date).replace(
+        hour=23, minute=59, second=59
+    )
+
+    filters = {
+        "sales_partner": sales_partner,
+        "time": ["between", [start_datetime, end_datetime]],
+    }
+
+    click_logs = frappe.get_all(
+        "Affiliate Click Log",
+        filters=filters,
+        order_by="time desc",
+        fields=["time", "referrer"],
+        start=start,
+        limit=limit,
+    )
+
+    total_clicks = frappe.db.count(
+        "Affiliate Click Log",
+        filters=filters,
+    )
+
+    result["click_logs"] = click_logs
+    result["total"] = total_clicks
+
+    return result
