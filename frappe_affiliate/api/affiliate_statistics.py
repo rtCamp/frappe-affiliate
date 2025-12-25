@@ -42,7 +42,7 @@ def get_monthly_statistics(affiliate_join, start, limit):
     )
 
     start_date = add_months(current_date, -start)
-    end_date = add_months(start_date, -limit)
+    end_date = add_months(start_date, -limit + 1)
 
     if end_date < affiliate_join_date:
         end_date = affiliate_join_date
@@ -79,8 +79,11 @@ def get_monthly_statistics(affiliate_join, start, limit):
         "values_total": total_dict,
         "start": start,
         "limit": limit,
-        "total": (current_date.year - affiliate_join_date.year) * 12
-        + (current_date.month - affiliate_join_date.month),
+        "total": max(
+            (current_date.year - affiliate_join_date.year) * 12
+            + (current_date.month - affiliate_join_date.month),
+            len(monthly_data),
+        ),
     }
     return data
 
