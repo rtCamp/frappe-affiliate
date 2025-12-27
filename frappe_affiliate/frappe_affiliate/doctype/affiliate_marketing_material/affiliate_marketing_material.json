@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "hash",
  "creation": "2025-12-22 11:26:43.387606",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -17,16 +18,19 @@
   {
    "fieldname": "material",
    "fieldtype": "Attach",
-   "label": "Material"
+   "in_list_view": 1,
+   "label": "Material",
+   "reqd": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-22 11:28:43.928646",
+ "modified": "2025-12-27 05:09:42.905144",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Marketing Material",
+ "naming_rule": "Random",
  "owner": "Administrator",
  "permissions": [
   {
