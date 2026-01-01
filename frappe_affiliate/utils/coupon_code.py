@@ -1,32 +1,38 @@
 import frappe
 from frappe import _ as translate
-from frappe.utils import cint, getdate, nowdate
+from frappe.utils import getdate, nowdate
 
 
 def update_coupon_code_count(coupon_code_doc, transaction_type):
-    if coupon_code_doc:
-        if transaction_type == "used":
-            if not coupon_code_doc.custom_subscription_maximum_use:
-                coupon_code_doc.custom_subscription_used_count = (
-                    coupon_code_doc.custom_subscription_used_count + 1
-                )
-                coupon_code_doc.save(ignore_permissions=True)
-            elif (
-                coupon_code_doc.custom_subscription_used_count
-                < coupon_code_doc.custom_subscription_maximum_use
-            ):
-                coupon_code_doc.custom_subscription_used_count = (
-                    coupon_code_doc.custom_subscription_used_count + 1
-                )
-                coupon_code_doc.save(ignore_permissions=True)
-            else:
-                frappe.throw(translate("Allowed quantity is exhausted"))
-        elif transaction_type == "cancelled":
-            if coupon_code_doc.custom_subscription_used_count > 0:
-                coupon_code_doc.custom_subscription_used_count = (
-                    coupon_code_doc.custom_subscription_used_count - 1
-                )
-                coupon_code_doc.save(ignore_permissions=True)
+    coupon_code_name = coupon_code_doc.name
+    if transaction_type == "used":
+        frappe.db.sql(
+            """
+                UPDATE `tabCoupon Code`
+                SET custom_subscription_used_count = custom_subscription_used_count + 1,
+                    modified = %s
+                    WHERE name = %s
+                    AND (custom_subscription_maximum_use IS NULL
+                OR custom_subscription_used_count < custom_subscription_maximum_use)
+                    """,
+            (frappe.utils.now(), coupon_code_name),
+        )
+
+        rows_affected = frappe.db.sql("""SELECT ROW_COUNT();""")[0][0]
+        if not rows_affected:
+            frappe.throw(translate("Allowed quantity is exhausted"))
+
+    elif transaction_type == "cancelled":
+        frappe.db.sql(
+            """
+                UPDATE `tabCoupon Code`
+                SET custom_subscription_used_count = GREATEST(custom_subscription_used_count - 1, 0),
+                    modified = %s
+                WHERE name = %s
+                AND custom_subscription_used_count > 0
+            """,
+            (frappe.utils.now(), coupon_code_name),
+        )
 
 
 def validate_coupon_code(
@@ -99,7 +105,6 @@ def check_item_in_coupon_batch(item_list, coupon_batch):
         pluck="item_code",
     )
     if apply_on_specific and apply_on_specific != []:
-        apply_on_specific = [cint(item_code) for item_code in apply_on_specific]
         applies = set(item_list).issubset(apply_on_specific)
         if not applies:
             return False
