@@ -1,3 +1,5 @@
+import re
+
 import frappe
 
 
@@ -138,3 +140,25 @@ def update_banner_and_text_link(banner_id, **kwargs):
                 return {"success": True, "message": "Banner updated successfully"}
 
         return {"success": False, "message": "Banner not found"}
+
+
+@frappe.whitelist()
+def get_affiliate_marketing_materials():
+    marketing_materials = frappe.get_all(
+        "Affiliate Marketing Material",
+        fields=["name", "material", "description"],
+    )
+
+    for material in marketing_materials:
+        path = material.get("material")
+        if path:
+            pattern = "^(?:(?:https?):\/\/)?(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}(?:[/?#][^\s]*)?$"
+            if re.match(pattern, path):
+                material["material_url"] = path
+            else:
+                material["material_url"] = frappe.utils.get_url(path)
+            material["material_name"] = path.split("/")[-1]
+        else:
+            material["material_url"] = None
+            material["material_name"] = ""
+    return marketing_materials
