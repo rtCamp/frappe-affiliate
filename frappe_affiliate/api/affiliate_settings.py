@@ -152,7 +152,7 @@ def get_affiliate_marketing_materials():
     for material in marketing_materials:
         path = material.get("material")
         if path:
-            pattern = "^[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$"
+            pattern = "^(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}(?:[/?#][^\s]*)?$"
             if re.match(pattern, path):
                 material["material_url"] = path
             else:
