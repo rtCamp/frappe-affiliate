@@ -42,9 +42,13 @@ def get_affiliate_keywords(
     }
     """
     if date_from:
-        date_from = get_datetime(date_from)
+        date_from = get_datetime(date_from).replace(
+            hour=0, minute=0, second=0, microsecond=0
+        )
     if date_to:
-        date_to = get_datetime(date_to)
+        date_to = get_datetime(date_to).replace(
+            hour=23, minute=59, second=59, microsecond=999999
+        )
 
     sales_partner = frappe.db.get_value(
         "Sales Partner", {"custom_user": frappe.session.user}, "name"
