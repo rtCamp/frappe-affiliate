@@ -6,6 +6,27 @@ from frappe.model.document import Document
 
 
 class AffiliateReferral(Document):
+    # begin: auto-generated types
+    # This code is auto-generated. Do not modify anything in this block.
+
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from frappe.types import DF
+
+        amount: DF.Currency
+        comment: DF.SmallText | None
+        date: DF.Date | None
+        is_manual: DF.Check
+        keyword: DF.Link | None
+        payment_entry: DF.Link | None
+        record_type: DF.Literal["referral", "void"]  # noqa: F821
+        sales_partner: DF.Link | None
+        tier: DF.Int
+        void: DF.Check
+        void_affiliate_referral: DF.Link | None
+    # end: auto-generated types
+
     def validate(self):
         db_is_void = frappe.db.get_value("Affiliate Referral", self.name, "void")
         if db_is_void != self.void:

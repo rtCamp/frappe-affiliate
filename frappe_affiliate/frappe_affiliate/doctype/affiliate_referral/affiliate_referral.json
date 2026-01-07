@@ -14,7 +14,8 @@
   "void",
   "void_affiliate_referral",
   "keyword",
-  "comment"
+  "comment",
+  "is_manual"
  ],
  "fields": [
   {
@@ -74,12 +75,18 @@
    "fieldtype": "Link",
    "label": "Void Affiliate Referral",
    "options": "Affiliate Referral"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_manual",
+   "fieldtype": "Check",
+   "label": "Is Manual"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-18 13:36:33.832412",
+ "modified": "2026-01-07 12:02:09.412185",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Referral",
