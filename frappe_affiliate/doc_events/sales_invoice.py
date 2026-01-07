@@ -40,3 +40,32 @@ def validate(doc, method=None):
             return
         doc.commission_rate = apply_referral_fee_rules(doc)
         doc.calculate_commission()
+
+
+def on_submit(doc, method=None):
+    is_return = doc.get("is_return", 0)
+    if not is_return:
+        return
+
+    return_invoice = doc.get("return_against", None)
+    if not return_invoice:
+        return
+
+    payment_entries = frappe.get_all(
+        "Payment Entry Reference",
+        filters={"reference_name": return_invoice},
+        fields=["parent"],
+        pluck="parent",
+        group_by="parent",
+    )
+
+    referrals = frappe.get_all(
+        "Affiliate Referral",
+        filters={"payment_entry": ["in", payment_entries], "tier": 0},
+        fields=["name"],
+        pluck="name",
+        distinct=True,
+    )
+
+    for referral in referrals:
+        frappe.set_value("Affiliate Referral", referral, "void", 1)
