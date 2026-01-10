@@ -152,6 +152,7 @@ doc_events = {
     },
     "Subscription": {
         "validate": ["frappe_affiliate.doc_events.subscription.validate"],
+        "before_insert": ["frappe_affiliate.doc_events.subscription.before_insert"],
     },
 }
 # Scheduled Tasks

@@ -47,3 +47,36 @@ def validate(doc, method=None):
                     )
                 )
                 return
+
+
+def before_insert(doc, method=None):
+    if frappe.flags.in_migrate:
+        return
+
+    linked_affiliate = None
+
+    if doc.party_type != "Customer":
+        return
+
+    if doc.custom_coupon_code:
+        coupon_code_doc = frappe.get_doc("Coupon Code", doc.custom_coupon_code)
+        if coupon_code_doc.customer and coupon_code_doc.customer != doc.party:
+            frappe.throw(translate("This coupon code is not valid for this user"))
+        if coupon_code_doc.custom_sales_partner:
+            linked_affiliate = coupon_code_doc.custom_sales_partner
+    else:
+        customer_affiliate = frappe.db.get_value(
+            "Customer", doc.party, "default_sales_partner"
+        )
+        if customer_affiliate and customer_affiliate != "":
+            linked_affiliate = customer_affiliate
+
+    if linked_affiliate:
+        affiliate_banned = frappe.db.get_value(
+            "Sales Partner",
+            linked_affiliate,
+            ["custom_banned", "custom_disabled"],
+            as_dict=True,
+        )
+        if not affiliate_banned.custom_disabled and not affiliate_banned.custom_banned:
+            doc.custom_affiliate = linked_affiliate
