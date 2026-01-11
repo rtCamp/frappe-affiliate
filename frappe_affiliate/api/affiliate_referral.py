@@ -11,7 +11,6 @@ def insert_manual_affiliate_referral(
     amount: float,
     date: str,
     comment: str | None = None,
-    calculate_tiered_referral: bool = False,
 ) -> str:
     """
     Inserts a manual affiliate referral for a given sales invoice and sales partner.
@@ -21,7 +20,6 @@ def insert_manual_affiliate_referral(
         amount: The amount for the affiliate referral.
         date: The date of the referral.
         comment: An optional comment for the referral.
-        calculate_tiered_referral: Boolean flag to indicate if tiered referral calculation should be forced.
     """
     if not amount or amount <= 0:
         frappe.throw(_("Amount must be a positive number."))
@@ -40,8 +38,5 @@ def insert_manual_affiliate_referral(
     new_referral.is_manual = 1
     new_referral.date = getdate(date)
     new_referral.insert()
-
-    if calculate_tiered_referral:
-        pass  # ToDo: Add logic to force calculate tiered referrals
 
     return new_referral.name
