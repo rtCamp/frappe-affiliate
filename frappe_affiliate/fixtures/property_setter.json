@@ -157,5 +157,37 @@
   "property_type": "Data",
   "row_name": null,
   "value": ""
+ },
+ {
+  "default_value": null,
+  "doc_type": "Sales Partner",
+  "docstatus": 0,
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocType",
+  "field_name": null,
+  "is_system_generated": 0,
+  "modified": "2026-01-11 03:48:11.103142",
+  "module": "Frappe Affiliate",
+  "name": "Sales Partner-main-title_field",
+  "property": "title_field",
+  "property_type": "Data",
+  "row_name": null,
+  "value": "partner_name"
+ },
+ {
+  "default_value": null,
+  "doc_type": "Sales Partner",
+  "docstatus": 0,
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocType",
+  "field_name": null,
+  "is_system_generated": 0,
+  "modified": "2026-01-11 03:48:20.507829",
+  "module": "Frappe Affiliate",
+  "name": "Sales Partner-main-show_title_field_in_link",
+  "property": "show_title_field_in_link",
+  "property_type": "Check",
+  "row_name": null,
+  "value": "1"
  }
 ]
