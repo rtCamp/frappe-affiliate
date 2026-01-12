@@ -132,7 +132,17 @@ def check_banner_embed(banner_text_link_route_path):
     if not banner_exists:
         return
 
-    banner_text_link = frappe.get_cached_doc("Affiliate Banner and Text Link", slug)
+    affiliate_settings = frappe.get_cached_doc("Affiliate Settings")
+    banners_text_links = affiliate_settings.get("banner_and_text_link") or []
+    banner_text_link = None
+
+    for btl in banners_text_links:
+        if btl.name == slug:
+            banner_text_link = btl
+            break
+
+    if not banner_text_link:
+        return
 
     item_type = banner_text_link.type or "Text Link"
     title = banner_text_link.title or ""
