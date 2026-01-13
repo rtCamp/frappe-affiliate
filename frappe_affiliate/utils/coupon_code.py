@@ -12,7 +12,8 @@ def update_coupon_code_count(coupon_code_doc, transaction_type):
                 SET custom_subscription_used_count = custom_subscription_used_count + 1,
                     modified = %s
                     WHERE name = %s
-                    AND (custom_subscription_maximum_use IS NULL
+                    AND (custom_subscription_maximum_use = 0
+                OR custom_subscription_maximum_use IS NULL
                 OR custom_subscription_used_count < custom_subscription_maximum_use)
                     """,
             (frappe.utils.now(), coupon_code_name),
