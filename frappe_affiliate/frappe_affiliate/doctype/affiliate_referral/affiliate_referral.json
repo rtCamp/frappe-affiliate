@@ -11,6 +11,7 @@
   "record_type",
   "payment_entry",
   "customer",
+  "customer_name",
   "tier",
   "void",
   "is_manual",
@@ -90,12 +91,18 @@
    "label": "Customer",
    "options": "Customer",
    "read_only": 1
+  },
+  {
+   "fetch_from": "customer.customer_name",
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "label": "Customer Name"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-01-14 07:47:07.847749",
+ "modified": "2026-01-14 07:50:23.646948",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Referral",

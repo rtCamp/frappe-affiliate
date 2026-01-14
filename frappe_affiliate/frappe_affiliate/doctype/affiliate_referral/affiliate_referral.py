@@ -17,6 +17,7 @@ class AffiliateReferral(Document):
         amount: DF.Currency
         comment: DF.SmallText | None
         customer: DF.Link | None
+        customer_name: DF.Data | None
         date: DF.Date | None
         is_manual: DF.Check
         keyword: DF.Link | None
