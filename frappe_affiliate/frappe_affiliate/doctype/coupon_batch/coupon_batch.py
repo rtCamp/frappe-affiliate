@@ -12,7 +12,9 @@ class CouponBatch(Document):
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
-        from erpnext.accounts.doctype.pricing_rule_item_code.pricing_rule_item_code import PricingRuleItemCode
+        from erpnext.accounts.doctype.pricing_rule_item_code.pricing_rule_item_code import (
+            PricingRuleItemCode,
+        )
         from frappe.types import DF
 
         amended_from: DF.Link | None

@@ -14,8 +14,13 @@ class AffiliateReferralFeeRule(Document):
 
     if TYPE_CHECKING:
         from frappe.types import DF
-        from frappe_affiliate.frappe_affiliate.doctype.referral_rule_item_code.referral_rule_item_code import ReferralRuleItemCode
-        from frappe_affiliate.frappe_affiliate.doctype.referral_user_group.referral_user_group import ReferralUserGroup
+
+        from frappe_affiliate.frappe_affiliate.doctype.referral_rule_item_code.referral_rule_item_code import (
+            ReferralRuleItemCode,
+        )
+        from frappe_affiliate.frappe_affiliate.doctype.referral_user_group.referral_user_group import (
+            ReferralUserGroup,
+        )
 
         apply_except_item_code: DF.Table[ReferralRuleItemCode]
         apply_on_group: DF.Table[ReferralUserGroup]
