@@ -7,7 +7,8 @@
  "engine": "InnoDB",
  "field_order": [
   "material",
-  "description"
+  "description",
+  "disables"
  ],
  "fields": [
   {
@@ -21,12 +22,19 @@
    "in_list_view": 1,
    "label": "Material",
    "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "disabled",
+   "fieldtype": "Check",
+   "label": "Disabled",
+   "search_index": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-27 05:09:42.905144",
+ "modified": "2026-01-15 04:09:06.585038",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Marketing Material",

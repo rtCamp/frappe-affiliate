@@ -147,6 +147,7 @@ def get_affiliate_marketing_materials():
     marketing_materials = frappe.get_all(
         "Affiliate Marketing Material",
         fields=["name", "material", "description"],
+        filters={"disabled": 0},
     )
 
     for material in marketing_materials:
