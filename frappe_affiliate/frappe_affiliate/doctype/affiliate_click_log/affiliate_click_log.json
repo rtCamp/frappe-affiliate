@@ -1,6 +1,5 @@
 {
  "actions": [],
- "allow_rename": 1,
  "autoname": "hash",
  "creation": "2025-10-06 12:39:05.181863",
  "doctype": "DocType",
@@ -18,8 +17,11 @@
   {
    "fieldname": "sales_partner",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Sales Partner",
-   "options": "Sales Partner"
+   "options": "Sales Partner",
+   "reqd": 1,
+   "search_index": 1
   },
   {
    "fieldname": "time",
@@ -35,13 +37,15 @@
   {
    "fieldname": "remote_address",
    "fieldtype": "Data",
-   "label": "Remote Address"
+   "label": "Remote Address",
+   "search_index": 1
   },
   {
    "fieldname": "keyword",
    "fieldtype": "Link",
    "label": "Keyword",
-   "options": "Affiliate Keyword"
+   "options": "Affiliate Keyword",
+   "search_index": 1
   },
   {
    "fieldname": "user_agent",
@@ -57,7 +61,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-15 11:00:58.622557",
+ "modified": "2026-01-14 08:13:14.593993",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Click Log",
@@ -80,5 +84,6 @@
  "row_format": "Dynamic",
  "sort_field": "creation",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }
