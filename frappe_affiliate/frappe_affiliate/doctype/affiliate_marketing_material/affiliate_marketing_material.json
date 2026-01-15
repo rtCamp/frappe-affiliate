@@ -7,7 +7,7 @@
  "field_order": [
   "material",
   "description",
-  "disables"
+  "disabled"
  ],
  "fields": [
   {
