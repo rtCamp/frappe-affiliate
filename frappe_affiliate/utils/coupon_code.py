@@ -107,6 +107,7 @@ def check_user_use_count(coupon_code_doc, customer):
                 "party_type": "Customer",
                 "party": customer,
                 "custom_coupon_code": coupon_code_doc.name,
+                "status": ["!=", "Pending"],
             },
         )
         if user_use_count >= coupon_user_use_count:
