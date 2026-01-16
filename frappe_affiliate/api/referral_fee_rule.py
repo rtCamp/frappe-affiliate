@@ -7,6 +7,9 @@ from frappe_affiliate.api.sales_invoice import get_invoice_count
 def get_referral_fee_rules(
     limit=20, offset=0, order_by="priority asc", comment_filter=None
 ):
+    filters = {}
+    if comment_filter:
+        filters["comment"] = ["like", f"%{comment_filter}%"]
     referral_fee_rules_list = frappe.get_list(
         "Affiliate Referral Fee Rule",
         fields=[
@@ -21,9 +24,7 @@ def get_referral_fee_rules(
         order_by=order_by,
         limit_page_length=limit,
         limit_start=offset,
-        filters={"comment": ["like", f"%{comment_filter}%"]}
-        if comment_filter
-        else None,
+        filters=filters,
     )
 
     result = {}
@@ -57,7 +58,7 @@ def get_referral_fee_rules(
                 "apply_on_group": apply_on_group_string,
             }
         )
-    result["total"] = frappe.db.count("Affiliate Referral Fee Rule")
+    result["total"] = frappe.db.count("Affiliate Referral Fee Rule", filters=filters)
     result["rules"] = referral_fee_rules
     return result
 
