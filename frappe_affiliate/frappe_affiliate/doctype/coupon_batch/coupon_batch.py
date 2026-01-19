@@ -102,6 +102,7 @@ class CouponBatch(Document):
             coupon.custom_apply_to_recurring = self.apply_to_recurring
             coupon.custom_sales_partner = self.sales_partner
             coupon.custom_subscription_maximum_use = self.subscription_maximum_use
+            coupon.custom_maximum_user_use_count = self.maximum_user_use_count
             coupon.valid_from = self.valid_from
             coupon.valid_upto = self.valid_upto
             coupon.maximum_use = self.maximum_use
