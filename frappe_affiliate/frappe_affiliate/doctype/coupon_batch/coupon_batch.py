@@ -33,9 +33,9 @@ class CouponBatch(Document):
         maximum_use: DF.Int
         maximum_user_use_count: DF.Int
         prefix: DF.Data | None
-        rate_or_discount: DF.Literal["Percentage", "Amount"]  # noqa F821
+        rate_or_discount: DF.Literal["Percentage", "Amount"]  # noqa 821
         recurring_discount: DF.Float
-        recurring_rate_or_discount: DF.Literal["Percentage", "Amount"]  # noqa F821
+        recurring_rate_or_discount: DF.Literal["Percentage", "Amount"]  # noqa 821
         sales_partner: DF.Link | None
         subscription_maximum_use: DF.Int
         valid_from: DF.Date | None
