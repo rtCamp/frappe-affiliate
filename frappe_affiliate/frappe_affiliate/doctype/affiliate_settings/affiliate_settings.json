@@ -59,7 +59,8 @@
    "fieldname": "banner_and_text_link",
    "fieldtype": "Table",
    "label": "Banner and Text Link",
-   "options": "Affiliate Banner and Text Link"
+   "options": "Affiliate Banner and Text Link",
+   "permlevel": 1
   },
   {
    "fieldname": "banner_and_text_link_route_path",
@@ -137,7 +138,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-11-20 04:38:03.172129",
+ "modified": "2026-01-18 12:39:53.263168",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Settings",
