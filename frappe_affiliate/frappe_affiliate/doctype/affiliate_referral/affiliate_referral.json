@@ -10,8 +10,11 @@
   "date",
   "record_type",
   "payment_entry",
+  "customer",
+  "customer_name",
   "tier",
   "void",
+  "is_manual",
   "void_affiliate_referral",
   "keyword",
   "comment"
@@ -85,6 +88,26 @@
    "fieldtype": "Link",
    "label": "Void Affiliate Referral",
    "options": "Affiliate Referral"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_manual",
+   "fieldtype": "Check",
+   "label": "Is Manual"
+  },
+  {
+   "fetch_from": "payment_entry.party",
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "customer.customer_name",
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "label": "Customer Name"
   }
  ],
  "grid_page_length": 50,
