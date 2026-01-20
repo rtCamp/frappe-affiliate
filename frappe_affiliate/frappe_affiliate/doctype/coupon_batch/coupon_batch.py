@@ -6,6 +6,42 @@ from frappe.model.document import Document
 
 
 class CouponBatch(Document):
+    # begin: auto-generated types
+    # This code is auto-generated. Do not modify anything in this block.
+
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from erpnext.accounts.doctype.pricing_rule_item_code.pricing_rule_item_code import (
+            PricingRuleItemCode,
+        )
+        from frappe.types import DF
+
+        amended_from: DF.Link | None
+        apply_except_item_code: DF.Table[PricingRuleItemCode]
+        apply_on_item_code: DF.Table[PricingRuleItemCode]
+        apply_to_recurring: DF.Check
+        code_length: DF.Int
+        coupon_code: DF.Data | None
+        coupon_name: DF.Data
+        coupon_type: DF.Literal["Single", "Batch of Random Coupon Codes"]  # noqa F722
+        coupons_count: DF.Int
+        customer: DF.Link | None
+        description: DF.TextEditor | None
+        disable: DF.Check
+        discount: DF.Float
+        maximum_use: DF.Int
+        maximum_user_use_count: DF.Int
+        prefix: DF.Data | None
+        rate_or_discount: DF.Literal["Percentage", "Amount"]  # noqa 821
+        recurring_discount: DF.Float
+        recurring_rate_or_discount: DF.Literal["Percentage", "Amount"]  # noqa 821
+        sales_partner: DF.Link | None
+        subscription_maximum_use: DF.Int
+        valid_from: DF.Date | None
+        valid_upto: DF.Date | None
+    # end: auto-generated types
+
     def validate(self):
         if not frappe.flags.in_migration:
             if self.coupon_type == "Single" and not self.coupon_code:
@@ -66,6 +102,7 @@ class CouponBatch(Document):
             coupon.custom_apply_to_recurring = self.apply_to_recurring
             coupon.custom_sales_partner = self.sales_partner
             coupon.custom_subscription_maximum_use = self.subscription_maximum_use
+            coupon.custom_maximum_user_use_count = self.maximum_user_use_count
             coupon.valid_from = self.valid_from
             coupon.valid_upto = self.valid_upto
             coupon.maximum_use = self.maximum_use

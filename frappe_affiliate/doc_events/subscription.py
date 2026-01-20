@@ -29,21 +29,3 @@ def validate(doc, method=None):
                         "Cannot use coupon code assigned to your own affiliate account."
                     )
                 )
-
-        coupon_user_use_count = coupon_code_doc.get("custom_maximum_user_use_count", 0)
-        if coupon_user_use_count > 0:
-            user_use_count = frappe.db.count(
-                "Subscription",
-                {
-                    "party_type": "Customer",
-                    "party": doc.party,
-                    "custom_coupon_code": doc.custom_coupon_code,
-                },
-            )
-            if user_use_count >= coupon_user_use_count:
-                frappe.throw(
-                    translate(
-                        "You have already used this coupon code for maximum allowed times."
-                    )
-                )
-                return

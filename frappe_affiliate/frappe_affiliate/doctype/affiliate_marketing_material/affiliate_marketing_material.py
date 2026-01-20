@@ -15,6 +15,7 @@ class AffiliateMarketingMaterial(Document):
         from frappe.types import DF
 
         description: DF.SmallText | None
+        disabled: DF.Check
         material: DF.Attach
     # end: auto-generated types
 
