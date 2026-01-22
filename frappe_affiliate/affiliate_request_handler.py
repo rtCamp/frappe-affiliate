@@ -2,6 +2,7 @@ from urllib.parse import urlencode
 
 import frappe
 from frappe import local
+from frappe.utils import get_url
 from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers import Response
 
@@ -148,9 +149,7 @@ def check_banner_embed(banner_text_link_route_path):
     title = banner_text_link.title or ""
     banner = banner_text_link.banner
     banner_url = (
-        frappe.utils.get_url(frappe.db.get_value("File", banner, "file_url"))
-        if banner
-        else ""
+        get_url(frappe.db.get_value("File", banner, "file_url")) if banner else ""
     )
 
     affiliate_user = frappe.db.exists("User", {"username": username, "enabled": 1})
@@ -167,6 +166,8 @@ def check_banner_embed(banner_text_link_route_path):
         {"custom_user": user, "custom_banned": 0, "custom_disabled": 0},
         "custom_affiliate_link",
     )
+
+    affiliate_link = get_url(affiliate_link)
 
     if item_type == "Text Link":
         js = f"""
