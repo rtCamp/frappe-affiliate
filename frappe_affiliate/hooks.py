@@ -145,6 +145,7 @@ doc_events = {
     },
     "Sales Invoice": {
         "validate": ["frappe_affiliate.doc_events.sales_invoice.validate"],
+        "on_submit": ["frappe_affiliate.doc_events.sales_invoice.on_submit"],
     },
     "Payment Entry": {
         "on_submit": ["frappe_affiliate.doc_events.payment_entry.on_submit"],
