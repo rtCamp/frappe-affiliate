@@ -10,8 +10,11 @@
   "date",
   "record_type",
   "payment_entry",
+  "customer",
+  "customer_name",
   "tier",
   "void",
+  "is_manual",
   "void_affiliate_referral",
   "keyword",
   "comment",
@@ -21,24 +24,34 @@
   {
    "fieldname": "sales_partner",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Sales Partner",
-   "options": "Sales Partner"
+   "options": "Sales Partner",
+   "reqd": 1,
+   "search_index": 1
   },
   {
    "fieldname": "amount",
    "fieldtype": "Currency",
-   "label": "Amount"
+   "in_list_view": 1,
+   "label": "Amount",
+   "reqd": 1
   },
   {
    "fieldname": "date",
    "fieldtype": "Date",
-   "label": "Date"
+   "in_list_view": 1,
+   "label": "Date",
+   "reqd": 1
   },
   {
    "fieldname": "record_type",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Record Type",
-   "options": "referral\nvoid"
+   "options": "referral\nvoid",
+   "reqd": 1,
+   "search_index": 1
   },
   {
    "fieldname": "payment_entry",
@@ -56,7 +69,8 @@
    "depends_on": "eval:doc.record_type == 'referral'",
    "fieldname": "void",
    "fieldtype": "Check",
-   "label": "Void"
+   "label": "Void",
+   "search_index": 1
   },
   {
    "fieldname": "keyword",
@@ -81,12 +95,26 @@
    "fieldname": "is_manual",
    "fieldtype": "Check",
    "label": "Is Manual"
+  },
+  {
+   "fetch_from": "payment_entry.party",
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "customer.customer_name",
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "label": "Customer Name"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-01-07 12:02:09.412185",
+ "modified": "2026-01-14 08:18:02.049456",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Referral",
@@ -109,5 +137,6 @@
  "row_format": "Dynamic",
  "sort_field": "creation",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

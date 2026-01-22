@@ -12,7 +12,8 @@ def update_coupon_code_count(coupon_code_doc, transaction_type):
                 SET custom_subscription_used_count = custom_subscription_used_count + 1,
                     modified = %s
                     WHERE name = %s
-                    AND (custom_subscription_maximum_use IS NULL
+                    AND (custom_subscription_maximum_use = 0
+                OR custom_subscription_maximum_use IS NULL
                 OR custom_subscription_used_count < custom_subscription_maximum_use)
                     """,
             (frappe.utils.now(), coupon_code_name),
@@ -74,6 +75,10 @@ def validate_coupon_code(
     if coupon_code_doc.customer and coupon_code_doc.customer != customer:
         return False
 
+    if customer and is_new_subscription:
+        if not check_user_use_count(coupon_code_doc, customer):
+            return False
+
     if item:
         coupon_batch = coupon_code_doc.get("custom_coupon_batch", None)
         if coupon_batch:
@@ -88,6 +93,24 @@ def validate_coupon_code(
             as_dict=True,
         )
         if affiliate_banned.custom_disabled or affiliate_banned.custom_banned:
+            return False
+
+    return True
+
+
+def check_user_use_count(coupon_code_doc, customer):
+    coupon_user_use_count = coupon_code_doc.get("custom_maximum_user_use_count", 0)
+    if coupon_user_use_count > 0:
+        user_use_count = frappe.db.count(
+            "Subscription",
+            {
+                "party_type": "Customer",
+                "party": customer,
+                "custom_coupon_code": coupon_code_doc.name,
+                "status": ["!=", "Pending"],
+            },
+        )
+        if user_use_count >= coupon_user_use_count:
             return False
 
     return True

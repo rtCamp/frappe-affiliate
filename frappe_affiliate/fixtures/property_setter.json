@@ -189,5 +189,21 @@
   "property_type": "Check",
   "row_name": null,
   "value": "1"
+ },
+ {
+    "default_value": null,
+    "doc_type": "Supplier",
+    "docstatus": 0,
+    "doctype": "Property Setter",
+    "doctype_or_field": "DocType",
+    "field_name": null,
+    "is_system_generated": 0,
+    "modified": "2026-01-13 14:42:07.466855",
+    "module": "Apex",
+    "name": "Supplier-main-allow_rename",
+    "property": "allow_rename",
+    "property_type": "Check",
+    "row_name": null,
+    "value": "0"
  }
 ]

@@ -1,6 +1,5 @@
 {
  "actions": [],
- "allow_rename": 1,
  "autoname": "hash",
  "creation": "2025-09-14 22:59:08.704434",
  "doctype": "DocType",
@@ -13,8 +12,11 @@
   {
    "fieldname": "sales_partner",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Sales Partner",
-   "options": "Sales Partner"
+   "options": "Sales Partner",
+   "reqd": 1,
+   "search_index": 1
   },
   {
    "fieldname": "keyword",
@@ -25,7 +27,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-15 10:58:44.477139",
+ "modified": "2026-01-14 08:18:19.158704",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Keyword",
@@ -48,5 +50,6 @@
  "row_format": "Dynamic",
  "sort_field": "creation",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

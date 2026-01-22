@@ -6,4 +6,16 @@ from frappe.model.document import Document
 
 
 class AffiliateKeyword(Document):
+    # begin: auto-generated types
+    # This code is auto-generated. Do not modify anything in this block.
+
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from frappe.types import DF
+
+        keyword: DF.SmallText | None
+        sales_partner: DF.Link
+    # end: auto-generated types
+
     pass

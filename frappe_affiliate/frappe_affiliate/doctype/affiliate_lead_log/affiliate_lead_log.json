@@ -1,6 +1,5 @@
 {
  "actions": [],
- "allow_rename": 1,
  "autoname": "hash",
  "creation": "2025-10-06 12:41:40.681856",
  "doctype": "DocType",
@@ -19,8 +18,11 @@
   {
    "fieldname": "sales_partner",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Sales Partner",
-   "options": "Sales Partner"
+   "options": "Sales Partner",
+   "reqd": 1,
+   "search_index": 1
   },
   {
    "fieldname": "time",
@@ -42,13 +44,17 @@
    "fieldname": "keyword",
    "fieldtype": "Link",
    "label": "Keyword",
-   "options": "Affiliate Keyword"
+   "options": "Affiliate Keyword",
+   "search_index": 1
   },
   {
    "fieldname": "user",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "User",
-   "options": "User"
+   "options": "User",
+   "reqd": 1,
+   "search_index": 1
   },
   {
    "fieldname": "first_visited",
@@ -64,7 +70,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-15 12:29:07.637124",
+ "modified": "2026-01-14 08:13:14.544457",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Lead Log",
@@ -87,5 +93,6 @@
  "row_format": "Dynamic",
  "sort_field": "creation",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }
