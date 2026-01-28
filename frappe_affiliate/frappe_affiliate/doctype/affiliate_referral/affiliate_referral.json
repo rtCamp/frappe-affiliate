@@ -17,7 +17,8 @@
   "is_manual",
   "void_affiliate_referral",
   "keyword",
-  "comment"
+  "comment",
+  "is_manual"
  ],
  "fields": [
   {

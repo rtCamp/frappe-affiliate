@@ -22,8 +22,12 @@ def get_invoice_count(doc):
     return count
 
 
-def apply_referral_fee_rules(doc):
-    if not doc.sales_partner or doc.sales_partner == "":
+def apply_referral_fee_rules(doc, sales_partner=None):
+    if (not doc.sales_partner or doc.sales_partner == "") and (
+        not sales_partner or sales_partner == ""
+    ):
+        return
+    if doc.is_return:
         return
     invoice_item_codes = set(item.item_code for item in doc.items)
     referral_fee_rules = frappe.get_all(
@@ -34,7 +38,7 @@ def apply_referral_fee_rules(doc):
 
     invoice_count = get_invoice_count(doc)
 
-    sales_partner = doc.sales_partner
+    sales_partner = doc.sales_partner if not sales_partner else sales_partner
     sales_partner_user = frappe.db.get_value(
         "Sales Partner", sales_partner, "custom_user"
     )

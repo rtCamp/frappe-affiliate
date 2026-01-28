@@ -142,6 +142,10 @@ class SubscriptionOverride(Subscription):
             > 0
         )
 
+        linked_affiliate = self.get("custom_affiliate", None)
+        if linked_affiliate and linked_affiliate != "":
+            invoice.sales_partner = linked_affiliate
+
         # Function had to be overridden to add custom coupon code here just before pricing rule related functions are executed.
         if self.get("custom_coupon_code", None):
             invoice.coupon_code = self.custom_coupon_code
