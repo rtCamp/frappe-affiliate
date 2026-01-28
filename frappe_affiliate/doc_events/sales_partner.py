@@ -11,7 +11,7 @@ def before_insert(doc, method=None):
         route_path = frappe.get_single_value(
             "Affiliate Settings", "affiliate_route_path"
         )
-        doc.custom_affiliate_link = frappe.utils.get_url(route_path + username)
+        doc.custom_affiliate_link = route_path + username
 
 
 def after_insert(doc, method=None):
