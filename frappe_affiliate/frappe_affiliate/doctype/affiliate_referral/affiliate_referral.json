@@ -17,8 +17,7 @@
   "is_manual",
   "void_affiliate_referral",
   "keyword",
-  "comment",
-  "is_manual"
+  "comment"
  ],
  "fields": [
   {
@@ -97,7 +96,7 @@
    "label": "Is Manual"
   },
   {
-   "fetch_from": "payment_entry.party",
+   "fetch_from": "sales_partner.custom_customer",
    "fieldname": "customer",
    "fieldtype": "Link",
    "label": "Customer",
@@ -114,7 +113,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-01-14 08:18:02.049456",
+ "modified": "2026-02-01 02:59:31.157865",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Referral",

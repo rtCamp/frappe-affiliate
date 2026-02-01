@@ -18,12 +18,12 @@ class AffiliateReferral(Document):
         comment: DF.SmallText | None
         customer: DF.Link | None
         customer_name: DF.Data | None
-        date: DF.Date | None
+        date: DF.Date
         is_manual: DF.Check
         keyword: DF.Link | None
         payment_entry: DF.Link | None
-        record_type: DF.Literal["referral", "void"]  # noqa: F821
-        sales_partner: DF.Link | None
+        record_type: DF.Literal["referral", "void"]
+        sales_partner: DF.Link
         tier: DF.Int
         void: DF.Check
         void_affiliate_referral: DF.Link | None
