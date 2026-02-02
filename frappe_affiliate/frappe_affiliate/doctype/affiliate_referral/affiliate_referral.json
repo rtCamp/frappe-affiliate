@@ -6,18 +6,19 @@
  "engine": "InnoDB",
  "field_order": [
   "sales_partner",
-  "amount",
-  "date",
-  "record_type",
-  "payment_entry",
   "customer",
   "customer_name",
   "tier",
+  "keyword",
+  "comment",
+  "column_break_ajek",
+  "record_type",
+  "date",
+  "payment_entry",
+  "amount",
   "void",
   "is_manual",
-  "void_affiliate_referral",
-  "keyword",
-  "comment"
+  "void_affiliate_referral"
  ],
  "fields": [
   {
@@ -41,7 +42,8 @@
    "fieldtype": "Date",
    "in_list_view": 1,
    "label": "Date",
-   "reqd": 1
+   "reqd": 1,
+   "search_index": 1
   },
   {
    "fieldname": "record_type",
@@ -108,12 +110,16 @@
    "fieldname": "customer_name",
    "fieldtype": "Data",
    "label": "Customer Name"
+  },
+  {
+   "fieldname": "column_break_ajek",
+   "fieldtype": "Column Break"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-01 02:59:31.157865",
+ "modified": "2026-02-02 05:49:20.518930",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Referral",
