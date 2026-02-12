@@ -50,25 +50,26 @@ def validate_coupon_code(
             return False
         coupon_code_doc = frappe.get_doc("Coupon Code", coupon_doc_name)
 
-    if is_new_subscription and coupon_code_doc.custom_disable:
-        return False
-    elif coupon_code_doc.valid_from and getdate(coupon_code_doc.valid_from) > getdate(
-        nowdate()
-    ):
-        return False
-    elif coupon_code_doc.valid_upto and getdate(coupon_code_doc.valid_upto) < getdate(
-        nowdate()
-    ):
-        return False
-    elif (
+    if is_new_subscription:
+        if coupon_code_doc.custom_disable:
+            return False
+        elif coupon_code_doc.valid_from and getdate(
+            coupon_code_doc.valid_from
+        ) > getdate(nowdate()):
+            return False
+        elif coupon_code_doc.valid_upto and getdate(
+            coupon_code_doc.valid_upto
+        ) < getdate(nowdate()):
+            return False
+        elif (
+            coupon_code_doc.custom_subscription_maximum_use
+            and coupon_code_doc.custom_subscription_used_count
+            >= coupon_code_doc.custom_subscription_maximum_use
+        ):
+            return False
+    if (
         coupon_code_doc.maximum_use
         and coupon_code_doc.used >= coupon_code_doc.maximum_use
-    ):
-        return False
-    elif (
-        coupon_code_doc.custom_subscription_maximum_use
-        and coupon_code_doc.custom_subscription_used_count
-        >= coupon_code_doc.custom_subscription_maximum_use
     ):
         return False
 
