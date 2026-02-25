@@ -3,15 +3,21 @@ from frappe.utils import getdate, nowdate
 
 
 @frappe.whitelist()
-def get_affiliate_coupons(affiliate_id):
-    user = frappe.db.get_value("User", {"username": affiliate_id}, "name")
-    sales_partner = frappe.db.get_value("Sales Partner", {"custom_user": user}, "name")
+def get_affiliate_coupons(start=0, limit=20):
+    user = frappe.session.user
+    if user == "Guest":
+        return []
+    sales_partner = frappe.db.get_value(
+        "Sales Partner", {"custom_user": user}, "name", cache=True
+    )
     coupon_codes = frappe.db.get_list(
         "Coupon Code",
         filters={"custom_sales_partner": sales_partner},
         fields=["coupon_code"],
         pluck="coupon_code",
         ignore_permissions=True,
+        limit_start=start,
+        limit_page_length=limit,
     )
     return coupon_codes
 
