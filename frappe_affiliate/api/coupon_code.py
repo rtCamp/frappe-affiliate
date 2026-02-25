@@ -6,7 +6,12 @@ from frappe.utils import getdate, nowdate
 def get_affiliate_coupons(start=0, limit=20):
     user = frappe.session.user
     if user == "Guest":
-        return []
+        return {
+            "coupon_codes": [],
+            "total": 0,
+            "start": start,
+            "limit": limit,
+        }
     sales_partner = frappe.db.get_value(
         "Sales Partner", {"custom_user": user}, "name", cache=True
     )
@@ -19,7 +24,19 @@ def get_affiliate_coupons(start=0, limit=20):
         limit_start=start,
         limit_page_length=limit,
     )
-    return coupon_codes
+
+    total_coupons = frappe.db.count(
+        "Coupon Code",
+        filters={"custom_sales_partner": sales_partner},
+        ignore_permissions=True,
+    )
+
+    return {
+        "coupon_codes": coupon_codes,
+        "total": total_coupons,
+        "start": start,
+        "limit": limit,
+    }
 
 
 @frappe.whitelist()
