@@ -15,9 +15,18 @@ def get_affiliate_coupons(start=0, limit=20):
     sales_partner = frappe.db.get_value(
         "Sales Partner", {"custom_user": user}, "name", cache=True
     )
+
+    filters = {
+        "custom_sales_partner": sales_partner,
+        "custom_disable": 0,
+        "valid_upto": [">=", nowdate()],
+        "valid_from": ["<=", nowdate()],
+        "custom_subscription_maximum_use": [">", 1],
+    }
+
     coupon_codes = frappe.db.get_list(
         "Coupon Code",
-        filters={"custom_sales_partner": sales_partner},
+        filters=filters,
         fields=["coupon_code"],
         pluck="coupon_code",
         ignore_permissions=True,
@@ -25,11 +34,7 @@ def get_affiliate_coupons(start=0, limit=20):
         limit_page_length=limit,
     )
 
-    total_coupons = frappe.db.count(
-        "Coupon Code",
-        filters={"custom_sales_partner": sales_partner},
-        ignore_permissions=True,
-    )
+    total_coupons = frappe.db.count("Coupon Code", filters=filters)
 
     return {
         "coupon_codes": coupon_codes,
