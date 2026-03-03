@@ -4,6 +4,7 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
+from frappe.utils import flt
 
 
 class AffiliateReferralFeeRule(Document):
@@ -33,6 +34,8 @@ class AffiliateReferralFeeRule(Document):
     # end: auto-generated types
 
     def validate(self):
+        self.first_referral_rate = flt(self.first_referral_rate)
+        self.subsequent_referral_rate = flt(self.subsequent_referral_rate)
         if self.first_referral_rate > 100 or self.subsequent_referral_rate > 100:
             frappe.throw(_("Referral rates must be between 0 and 100."))
 
