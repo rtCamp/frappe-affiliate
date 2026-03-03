@@ -67,6 +67,7 @@
    "fieldtype": "Percent",
    "in_list_view": 1,
    "label": "First Referral Rate",
+   "non_negative": 1,
    "reqd": 1
   },
   {
@@ -74,13 +75,14 @@
    "fieldtype": "Percent",
    "in_list_view": 1,
    "label": "Subsequent Referral Rate",
+   "non_negative": 1,
    "reqd": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-01-14 08:21:32.119408",
+ "modified": "2026-03-03 00:34:58.527008",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Referral Fee Rule",
