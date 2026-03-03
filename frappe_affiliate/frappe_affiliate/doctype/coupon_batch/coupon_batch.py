@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 
 import frappe
+from frappe import _
 from frappe.model.document import Document
 
 
@@ -46,6 +47,13 @@ class CouponBatch(Document):
         if not frappe.flags.in_migration:
             if self.coupon_type == "Single" and not self.coupon_code:
                 self.coupon_code = frappe.generate_hash()[:10].upper()
+            elif self.coupon_type == "Batch of Random Coupon Codes":
+                if not self.coupons_count or not self.code_length:
+                    frappe.throw(
+                        _(
+                            "For batch coupon generation, both Coupons Count and Code Length are required."
+                        )
+                    )
 
     def on_update(self):
         if not frappe.flags.in_migration:
