@@ -13,13 +13,8 @@ class AffiliateSettings(Document):
 
     if TYPE_CHECKING:
         from frappe.types import DF
-
-        from frappe_affiliate.frappe_affiliate.doctype.affiliate_banner_and_text_link.affiliate_banner_and_text_link import (
-            AffiliateBannerandTextLink,
-        )
-        from frappe_affiliate.frappe_affiliate.doctype.referral_user_group.referral_user_group import (
-            ReferralUserGroup,
-        )
+        from frappe_affiliate.frappe_affiliate.doctype.affiliate_banner_and_text_link.affiliate_banner_and_text_link import AffiliateBannerandTextLink
+        from frappe_affiliate.frappe_affiliate.doctype.referral_user_group.referral_user_group import ReferralUserGroup
 
         affiliate_redirect_url: DF.Data
         affiliate_registration_email: DF.Link | None

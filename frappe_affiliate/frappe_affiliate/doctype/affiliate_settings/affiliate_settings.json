@@ -25,18 +25,21 @@
  ],
  "fields": [
   {
+   "description": "Days to store cookies about referred affiliate",
    "fieldname": "cookie_timeout",
    "fieldtype": "Int",
    "label": "Cookie Timeout",
    "non_negative": 1
   },
   {
+   "description": "Minimal commission amount earned by affiliate to include it to payout report",
    "fieldname": "minimum_payout",
    "fieldtype": "Int",
    "label": "Minimum Payout",
    "non_negative": 1
   },
   {
+   "description": "Number of days that should go through before commission is included to payout report",
    "fieldname": "delay_payout_days",
    "fieldtype": "Int",
    "label": "Delay Payout (days)",
@@ -44,6 +47,7 @@
   },
   {
    "default": "0",
+   "description": "Enable ability to track traffic sources adding keywords to url",
    "fieldname": "enable_keywords_support",
    "fieldtype": "Check",
    "label": "Enable Keywords Support"
@@ -138,7 +142,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-01-18 12:39:53.263168",
+ "modified": "2026-03-11 10:51:00.801554",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Affiliate Settings",
