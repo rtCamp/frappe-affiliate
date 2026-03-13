@@ -24,61 +24,70 @@ def validate(doc, method=None):
 
 
 def on_submit(doc, method=None):
-    is_return = doc.get("is_return", 0)
-    if not is_return:
+    if not doc.get("is_return"):
         return
 
-    return_invoice = doc.get("return_against", None)
+    return_invoice = doc.get("return_against")
     if not return_invoice:
         return
 
-    original_invoice_value = frappe.get_value("Sales Invoice", return_invoice, "total")
+    original_invoice_value = frappe.db.get_value(
+        "Sales Invoice", return_invoice, "total"
+    )
     return_invoice_value = doc.total
 
-    if return_invoice_value > 0:
+    if not original_invoice_value or return_invoice_value >= 0:
         return
 
     percentage_deduction = abs(return_invoice_value) / original_invoice_value
 
-    payment_entries = frappe.get_list(
+    payment_entries = frappe.get_all(
         "Payment Entry Reference",
         filters={"reference_name": return_invoice},
-        fields=["parent"],
         pluck="parent",
-        group_by="parent",
+        distinct=True,
     )
 
-    referrals = frappe.get_list(
+    if not payment_entries:
+        return
+
+    referrals = frappe.get_all(
         "Affiliate Referral",
         filters={
             "payment_entry": ["in", payment_entries],
             "void": 0,
             "record_type": "referral",
         },
-        fields=["name"],
-        pluck="name",
-        distinct=True,
+        fields=["name", "amount", "sales_partner", "payment_entry"],
     )
 
-    for referral in referrals:
-        frappe.db.set_value(
-            "Affiliate Referral", referral, "void", 1
-        )  # Set through frappe.db to avoid triggering events
-        voided_referral = frappe.get_doc("Affiliate Referral", referral)
+    if not referrals:
+        return
+
+    referral_names = [ref.name for ref in referrals]
+
+    frappe.db.set_value(
+        "Affiliate Referral", {"name": ["in", referral_names]}, "void", 1
+    )
+
+    current_date = frappe.utils.nowdate()
+
+    for ref in referrals:
+        adjusted_amount = ref.amount * percentage_deduction
+
         void_referral_doc = frappe.new_doc("Affiliate Referral")
 
-        adjusted_amount = voided_referral.amount * percentage_deduction
+        void_referral_doc.update(
+            {
+                "sales_partner": ref.sales_partner,
+                "payment_entry": ref.payment_entry,
+                "amount": adjusted_amount,
+                "record_type": "void",
+                "tier": 0,
+                "void": 0,
+                "void_affiliate_referral": ref.name,
+                "date": current_date,
+            }
+        )
 
-        set_values = {
-            "sales_partner": voided_referral.sales_partner,
-            "payment_entry": voided_referral.payment_entry,
-            "amount": adjusted_amount,
-            "record_type": "void",
-            "tier": 0,
-            "void": 0,
-            "void_affiliate_referral": voided_referral.name,
-            "date": frappe.utils.nowdate(),
-        }
-
-        void_referral_doc.update(set_values)
         void_referral_doc.deferred_insert()
