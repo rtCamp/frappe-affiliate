@@ -3,7 +3,7 @@ from frappe.utils import getdate, nowdate
 
 
 @frappe.whitelist()
-def get_affiliate_coupons(affiliate_id):
+def get_affiliate_coupons(affiliate_id: str):
     user = frappe.db.get_value("User", {"username": affiliate_id}, "name")
     sales_partner = frappe.db.get_value("Sales Partner", {"custom_user": user}, "name")
     coupon_codes = frappe.db.get_list(
@@ -17,7 +17,7 @@ def get_affiliate_coupons(affiliate_id):
 
 
 @frappe.whitelist()
-def validate_coupon_code(coupon_code, customer=None):
+def validate_coupon_code(coupon_code: str, customer: str | None = None):
     if not coupon_code:
         return {"valid": False, "message": "No coupon code provided"}
 

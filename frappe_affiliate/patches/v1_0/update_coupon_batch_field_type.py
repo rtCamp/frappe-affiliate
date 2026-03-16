@@ -11,7 +11,7 @@ def execute():
 
         for column in columns_to_drop:
             if column in current_columns:
-                frappe.db.sql(f"ALTER TABLE `tabCoupon Batch` DROP COLUMN `{column}`")
+                frappe.db.sql("ALTER TABLE `tabCoupon Batch` DROP COLUMN %s", (column))
         # frappe.db.commit()
     except Exception as e:
         frappe.log_error(frappe.get_traceback(), "update_coupon_batch_field_type")

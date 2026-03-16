@@ -12,7 +12,9 @@ from frappe.utils import (
 
 
 @frappe.whitelist()
-def get_affiliate_statistics(by_month=0, month=None, start=0, limit=20):
+def get_affiliate_statistics(
+    by_month: int = 0, month: str | None = None, start: int = 0, limit: int = 20
+):
     affiliate_join = frappe.db.get_value(
         "Sales Partner", {"custom_user": frappe.session.user}, "creation"
     )
@@ -193,7 +195,9 @@ def get_period_statistics(start_date, end_date):
 
 
 @frappe.whitelist(methods=["GET"])
-def get_click_log_for_statistic(date=None, by_month=1, start=0, limit=20) -> dict:
+def get_click_log_for_statistic(
+    date: str | None = None, by_month: int = 1, start: int = 0, limit: int = 20
+) -> dict:
     """
     Get click log entries for a specific date
 
