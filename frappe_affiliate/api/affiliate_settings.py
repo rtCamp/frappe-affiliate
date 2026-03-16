@@ -21,7 +21,11 @@ def get_affiliate_settings():
 
 
 @frappe.whitelist()
-def get_banners_and_text_links(name=None, type_filter=None, category_filter=None):
+def get_banners_and_text_links(
+    name: str | None = None,
+    type_filter: str | None = None,
+    category_filter: str | None = None,
+):
     return_disabled = False
     if frappe.has_permission("Affiliate Settings", "write") is True:
         return_disabled = True
@@ -126,7 +130,7 @@ def get_banner_and_text_link_categories():
 
 
 @frappe.whitelist(methods=["POST"])
-def update_banner_and_text_link(banner_id, **kwargs):
+def update_banner_and_text_link(banner_id: str, **kwargs):
     """Update a specific banner and text link row in the child table"""
     affiliate_settings = frappe.get_single("Affiliate Settings")
     if hasattr(affiliate_settings, "banner_and_text_link"):

@@ -5,7 +5,10 @@ from frappe_affiliate.api.sales_invoice import get_invoice_count
 
 @frappe.whitelist()
 def get_referral_fee_rules(
-    limit=20, offset=0, order_by="priority asc", comment_filter=None
+    limit: int = 20,
+    offset: int = 0,
+    order_by: str = "priority asc",
+    comment_filter: str | None = None,
 ):
     filters = {}
     if comment_filter:
