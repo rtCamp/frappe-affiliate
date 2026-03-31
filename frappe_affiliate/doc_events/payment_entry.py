@@ -25,6 +25,8 @@ def on_submit(doc, method=None):
     ):
         record_referral(sales_invoice_doc, doc)
 
+    if not sales_invoice_doc.custom_apex_public_id:
+        return
     sales_invoice_count = sales_invoice_doc.custom_apex_public_id.split("/")[-1]
     if sales_invoice_count == "1" and sales_invoice_doc.coupon_code:
         coupon_code_doc = frappe.get_doc("Coupon Code", sales_invoice_doc.coupon_code)
