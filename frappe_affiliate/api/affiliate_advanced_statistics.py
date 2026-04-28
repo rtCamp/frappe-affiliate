@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import frappe
 from frappe.utils import (
     add_days,
@@ -365,6 +367,21 @@ def get_grouped_statistics(start_date, end_date, grouping, user=None):
         fields=["time", "remote_address"],
     )
 
+    # Pre-bucket referrals by date to avoid O(periods × rows) scans in the loop.
+    # Structure: {date: {"referral": [amounts], "void": [amounts]}}
+    referrals_by_date = defaultdict(lambda: {"referral": [], "void": []})
+    for r in all_referrals:
+        referrals_by_date[r.date][r.record_type].append(r.amount)
+
+    # Pre-bucket click remote_addresses by calendar date.
+    # Unique-click counting per period unions all IPs across all dates in the period,
+    # giving correct cross-day deduplication (e.g. same IP on Mon + Wed = 1 unique for
+    # the week). A day-level SQL GROUP BY approach would overcount in multi-day periods.
+    # Structure: {date: [remote_address, ...]}
+    clicks_by_date = defaultdict(list)
+    for c in all_clicks:
+        clicks_by_date[getdate(c.time)].append(c.remote_address)
+
     data = []
     current_date = start_date
 
@@ -411,29 +428,32 @@ def get_grouped_statistics(start_date, end_date, grouping, user=None):
         if period_start > end_date:
             break
 
-        # Aggregate from pre-fetched data (no additional DB queries per period).
-        period_end_dt = get_datetime(period_end).replace(hour=23, minute=59, second=59)
-        period_start_dt = get_datetime(period_start)
-
+        # Aggregate from pre-bucketed dicts — O(dates_in_period) per iteration,
+        # not O(all_rows) as it was with the previous list-comprehension scans.
+        dates_in_period = [
+            d for d in referrals_by_date if period_start <= d <= period_end
+        ]
         sales_amounts = [
-            r.amount
-            for r in all_referrals
-            if r.record_type == "referral" and period_start <= r.date <= period_end
+            a for d in dates_in_period for a in referrals_by_date[d]["referral"]
         ]
         void_amounts = [
-            r.amount
-            for r in all_referrals
-            if r.record_type == "void" and period_start <= r.date <= period_end
+            a for d in dates_in_period for a in referrals_by_date[d]["void"]
         ]
-        period_clicks = [
-            c for c in all_clicks if period_start_dt <= c.time <= period_end_dt
+
+        click_dates_in_period = [
+            d for d in clicks_by_date if period_start <= d <= period_end
         ]
+        period_total_clicks = sum(len(clicks_by_date[d]) for d in click_dates_in_period)
+        # Union all IPs across the period to get true cross-day unique visitors.
+        period_unique_ips = len(
+            {ip for d in click_dates_in_period for ip in clicks_by_date[d]}
+        )
 
         stats = {
             "transactions": len(sales_amounts),
-            "referral_fee_earned": float(sum(sales_amounts) - sum(void_amounts)),
-            "clicks": len(period_clicks),
-            "unique_clicks": len({c.remote_address for c in period_clicks}),
+            "referral_fee_earned": sum(sales_amounts) - sum(void_amounts),
+            "clicks": period_total_clicks,
+            "unique_clicks": period_unique_ips,
             "period": period_key,
             "period_label": period_label,
             "period_start": formatdate(period_start, "yyyy-MM-dd"),
