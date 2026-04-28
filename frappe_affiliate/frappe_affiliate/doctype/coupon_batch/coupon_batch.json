@@ -184,6 +184,7 @@
    "fieldname": "discount",
    "fieldtype": "Float",
    "label": "Discount",
+   "non_negative": 1,
    "reqd": 1
   },
   {
@@ -200,7 +201,8 @@
    "fieldname": "recurring_discount",
    "fieldtype": "Float",
    "label": "Recurring Discount",
-   "mandatory_depends_on": "eval:doc.apply_to_recurring"
+   "mandatory_depends_on": "eval:doc.apply_to_recurring",
+   "non_negative": 1
   },
   {
    "fieldname": "column_break_sohp",
@@ -220,7 +222,7 @@
   }
  ],
  "links": [],
- "modified": "2026-01-18 21:29:14.863543",
+ "modified": "2026-03-03 00:37:13.174315",
  "modified_by": "Administrator",
  "module": "Frappe Affiliate",
  "name": "Coupon Batch",
