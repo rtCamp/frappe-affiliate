@@ -1,19 +1,58 @@
 import frappe
-from frappe.utils import getdate, nowdate
+from frappe.query_builder import DocType
+from frappe.query_builder.functions import Count
+from frappe.utils import getdate, nowdate, cint
 
 
-@frappe.whitelist()
-def get_affiliate_coupons(affiliate_id: str):
-    user = frappe.db.get_value("User", {"username": affiliate_id}, "name")
-    sales_partner = frappe.db.get_value("Sales Partner", {"custom_user": user}, "name")
-    coupon_codes = frappe.db.get_list(
-        "Coupon Code",
-        filters={"custom_sales_partner": sales_partner},
-        fields=["coupon_code"],
-        pluck="coupon_code",
-        ignore_permissions=True,
+@frappe.whitelist(methods=["GET"])
+def get_affiliate_coupons(start: str | int = 0, limit: str | int = 20):
+    start = max(0, cint(start))
+    limit = max(cint(limit), 0)
+
+    result = {"coupon_codes": [], "total": 0, "start": start, "limit": limit}
+
+    user = frappe.session.user
+    if user == "Guest":
+        return result
+
+    sales_partner = frappe.db.get_value(
+        "Sales Partner", {"custom_user": user}, "name", cache=True
     )
-    return coupon_codes
+    if not sales_partner:
+        return result
+
+    partner_status = frappe.db.get_value(
+        "Sales Partner",
+        sales_partner,
+        ["custom_banned", "custom_disabled"],
+        as_dict=True,
+    )
+    if partner_status.custom_banned or partner_status.custom_disabled:
+        return result
+
+    today = nowdate()
+    CC = DocType("Coupon Code")
+
+    base = (
+        frappe.qb.from_(CC)
+        .where(CC.custom_sales_partner == sales_partner)
+        .where(CC.custom_disable == 0)
+        .where((CC.valid_upto.isnull()) | (CC.valid_upto >= today))
+        .where((CC.valid_from.isnull()) | (CC.valid_from <= today))
+        .where(
+            (CC.custom_subscription_maximum_use.isnull())
+            | (CC.custom_subscription_maximum_use == 0)
+            | (CC.custom_subscription_maximum_use > 1)
+        )
+    )
+
+    result["coupon_codes"] = [
+        row[0]
+        for row in base.select(CC.coupon_code).offset(start).limit(limit).run()
+    ]
+    result["total"] = base.select(Count("*")).run()[0][0]
+
+    return result
 
 
 @frappe.whitelist()
