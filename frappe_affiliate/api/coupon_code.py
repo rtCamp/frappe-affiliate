@@ -1,7 +1,7 @@
 import frappe
 from frappe.query_builder import DocType
 from frappe.query_builder.functions import Count
-from frappe.utils import getdate, nowdate, cint
+from frappe.utils import cint, getdate, nowdate
 
 
 @frappe.whitelist(methods=["GET"])
@@ -40,15 +40,19 @@ def get_affiliate_coupons(start: str | int = 0, limit: str | int = 20):
         .where((CC.valid_upto.isnull()) | (CC.valid_upto >= today))
         .where((CC.valid_from.isnull()) | (CC.valid_from <= today))
         .where(
+            (CC.maximum_use.isnull())
+            | (CC.maximum_use == 0)
+            | (CC.used < CC.maximum_use)
+        )
+        .where(
             (CC.custom_subscription_maximum_use.isnull())
             | (CC.custom_subscription_maximum_use == 0)
-            | (CC.custom_subscription_maximum_use > 1)
+            | (CC.custom_subscription_used_count < CC.custom_subscription_maximum_use)
         )
     )
 
     result["coupon_codes"] = [
-        row[0]
-        for row in base.select(CC.coupon_code).offset(start).limit(limit).run()
+        row[0] for row in base.select(CC.coupon_code).offset(start).limit(limit).run()
     ]
     result["total"] = base.select(Count("*")).run()[0][0]
 
