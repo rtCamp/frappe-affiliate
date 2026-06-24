@@ -1,15 +1,17 @@
-from collections import defaultdict
-
 import frappe
 from frappe.utils import (
     add_days,
     add_months,
     date_diff,
     formatdate,
-    get_datetime,
     get_first_day,
     get_last_day,
     getdate,
+)
+
+from frappe_affiliate.utils.statistics import (
+    aggregate_period,
+    fetch_referral_and_click_buckets,
 )
 
 
@@ -332,10 +334,9 @@ def get_period_dates(period, start_date=None, end_date=None, affiliate_join=None
 def get_grouped_statistics(start_date, end_date, grouping, user=None):
     """Get statistics grouped by the specified grouping (Day, Week, Month, Quarter, Year).
 
-    Uses batch queries to avoid the N+1 query problem for large date ranges: all referral
-    and click data for the full range is fetched once and then aggregated in Python per period.
+    One bulk fetch for the full range (fetch_referral_and_click_buckets), then each period
+    is aggregated in memory via aggregate_period — avoiding the per-period N+1 queries.
     """
-    # Resolve Sales Partner once — avoids one redundant DB round-trip per period.
     sales_partner = frappe.db.get_value(
         "Sales Partner", {"custom_user": user or frappe.session.user}, "name"
     )
@@ -343,44 +344,9 @@ def get_grouped_statistics(start_date, end_date, grouping, user=None):
     if not sales_partner:
         return []
 
-    end_datetime = get_datetime(end_date).replace(hour=23, minute=59, second=59)
-
-    # Single bulk fetch for all referrals in the full date range.
-    all_referrals = frappe.get_all(
-        "Affiliate Referral",
-        filters={
-            "sales_partner": sales_partner,
-            "record_type": ["in", ["referral", "void"]],
-            "date": ["between", [start_date, end_date]],
-            "void": 0,
-        },
-        fields=["date", "amount", "record_type"],
+    referrals_by_date, clicks_by_date = fetch_referral_and_click_buckets(
+        sales_partner, start_date, end_date
     )
-
-    # Single bulk fetch for all clicks in the full date range.
-    all_clicks = frappe.get_all(
-        "Affiliate Click Log",
-        filters={
-            "sales_partner": sales_partner,
-            "time": ["between", [get_datetime(start_date), end_datetime]],
-        },
-        fields=["time", "remote_address"],
-    )
-
-    # Pre-bucket referrals by date to avoid O(periods × rows) scans in the loop.
-    # Structure: {date: {"referral": [amounts], "void": [amounts]}}
-    referrals_by_date = defaultdict(lambda: {"referral": [], "void": []})
-    for r in all_referrals:
-        referrals_by_date[r.date][r.record_type].append(r.amount)
-
-    # Pre-bucket click remote_addresses by calendar date.
-    # Unique-click counting per period unions all IPs across all dates in the period,
-    # giving correct cross-day deduplication (e.g. same IP on Mon + Wed = 1 unique for
-    # the week). A day-level SQL GROUP BY approach would overcount in multi-day periods.
-    # Structure: {date: [remote_address, ...]}
-    clicks_by_date = defaultdict(list)
-    for c in all_clicks:
-        clicks_by_date[getdate(c.time)].append(c.remote_address)
 
     data = []
     current_date = start_date
@@ -428,37 +394,17 @@ def get_grouped_statistics(start_date, end_date, grouping, user=None):
         if period_start > end_date:
             break
 
-        # Aggregate from pre-bucketed dicts — O(dates_in_period) per iteration,
-        # not O(all_rows) as it was with the previous list-comprehension scans.
-        dates_in_period = [
-            d for d in referrals_by_date if period_start <= d <= period_end
-        ]
-        sales_amounts = [
-            a for d in dates_in_period for a in referrals_by_date[d]["referral"]
-        ]
-        void_amounts = [
-            a for d in dates_in_period for a in referrals_by_date[d]["void"]
-        ]
-
-        click_dates_in_period = [
-            d for d in clicks_by_date if period_start <= d <= period_end
-        ]
-        period_total_clicks = sum(len(clicks_by_date[d]) for d in click_dates_in_period)
-        # Union all IPs across the period to get true cross-day unique visitors.
-        period_unique_ips = len(
-            {ip for d in click_dates_in_period for ip in clicks_by_date[d]}
+        stats = aggregate_period(
+            referrals_by_date, clicks_by_date, period_start, period_end
         )
-
-        stats = {
-            "transactions": len(sales_amounts),
-            "referral_fee_earned": sum(sales_amounts) - sum(void_amounts),
-            "clicks": period_total_clicks,
-            "unique_clicks": period_unique_ips,
-            "period": period_key,
-            "period_label": period_label,
-            "period_start": formatdate(period_start, "yyyy-MM-dd"),
-            "period_end": formatdate(period_end, "yyyy-MM-dd"),
-        }
+        stats.update(
+            {
+                "period": period_key,
+                "period_label": period_label,
+                "period_start": formatdate(period_start, "yyyy-MM-dd"),
+                "period_end": formatdate(period_end, "yyyy-MM-dd"),
+            }
+        )
 
         data.append(stats)
         current_date = next_date
@@ -484,54 +430,9 @@ def get_period_statistics(start_date, end_date, user=None):
             "unique_clicks": 0,
         }
 
-    start_datetime = get_datetime(start_date)
-    end_datetime = get_datetime(end_date).replace(hour=23, minute=59, second=59)
-
-    sales = frappe.get_all(
-        "Affiliate Referral",
-        filters={
-            "sales_partner": sales_partner,
-            "record_type": "referral",
-            "date": ["between", [start_datetime, end_datetime]],
-            "void": 0,
-        },
-        fields="amount",
-        pluck="amount",
+    period_start = getdate(start_date)
+    period_end = getdate(end_date)
+    referrals_by_date, clicks_by_date = fetch_referral_and_click_buckets(
+        sales_partner, period_start, period_end
     )
-    void_sales = frappe.get_all(
-        "Affiliate Referral",
-        filters={
-            "sales_partner": sales_partner,
-            "record_type": "void",
-            "date": ["between", [start_datetime, end_datetime]],
-            "void": 0,
-        },
-        fields="amount",
-        pluck="amount",
-    )
-    sales_count = len(sales)
-    total_referral_fee = sum(sales) - sum(void_sales)
-
-    clicks_count = frappe.db.count(
-        "Affiliate Click Log",
-        filters={
-            "sales_partner": sales_partner,
-            "time": ["between", [start_datetime, end_datetime]],
-        },
-    )
-    unique_clicks_count = frappe.get_all(
-        "Affiliate Click Log",
-        filters={
-            "sales_partner": sales_partner,
-            "time": ["between", [start_datetime, end_datetime]],
-        },
-        fields=["remote_address"],
-        group_by="remote_address",
-    )
-
-    return {
-        "transactions": sales_count,
-        "referral_fee_earned": total_referral_fee,
-        "clicks": clicks_count or 0,
-        "unique_clicks": len(unique_clicks_count) or 0,
-    }
+    return aggregate_period(referrals_by_date, clicks_by_date, period_start, period_end)

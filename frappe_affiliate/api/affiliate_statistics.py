@@ -10,6 +10,11 @@ from frappe.utils import (
     getdate,
 )
 
+from frappe_affiliate.utils.statistics import (
+    aggregate_period,
+    fetch_referral_and_click_buckets,
+)
+
 
 @frappe.whitelist()
 def get_affiliate_statistics(
@@ -51,6 +56,15 @@ def get_monthly_statistics(affiliate_join, start, limit):
     if start_date < affiliate_join_date:
         start_date = affiliate_join_date
 
+    sales_partner = frappe.db.get_value(
+        "Sales Partner", {"custom_user": frappe.session.user}, "name"
+    )
+    # Fetch the whole window once and aggregate each month in memory to avoid per-month
+    # queries. get_period_statistics remains the standalone single-period version.
+    referrals_by_date, clicks_by_date = fetch_referral_and_click_buckets(
+        sales_partner, get_first_day(end_date), get_last_day(start_date)
+    )
+
     monthly_data = []
 
     total_dict = {
@@ -65,7 +79,9 @@ def get_monthly_statistics(affiliate_join, start, limit):
         month_start = get_first_day(current_month)
         month_end = get_last_day(current_month)
 
-        stats = get_period_statistics(month_start, month_end)
+        stats = aggregate_period(
+            referrals_by_date, clicks_by_date, month_start, month_end
+        )
         stats["period"] = formatdate(month_start, "yyyy-MM")
         stats["period_label"] = formatdate(month_start, "MMMM yyyy")
 
@@ -105,6 +121,14 @@ def get_daily_statistics(month):
     except (ValueError, AttributeError):
         return {"error": "Invalid month format. Use YYYY-MM"}
 
+    sales_partner = frappe.db.get_value(
+        "Sales Partner", {"custom_user": frappe.session.user}, "name"
+    )
+    # Fetch the whole month once and aggregate each day in memory to avoid per-day queries.
+    referrals_by_date, clicks_by_date = fetch_referral_and_click_buckets(
+        sales_partner, month_start, month_end
+    )
+
     daily_data = []
 
     total_dict = {
@@ -116,7 +140,9 @@ def get_daily_statistics(month):
 
     current_day = month_start
     while current_day <= month_end:
-        stats = get_period_statistics(current_day, current_day)
+        stats = aggregate_period(
+            referrals_by_date, clicks_by_date, current_day, current_day
+        )
         stats["period"] = formatdate(current_day, "yyyy-MM-dd")
         stats["period_label"] = formatdate(current_day, "MMMM dd, yyyy")
 
@@ -136,8 +162,11 @@ def get_daily_statistics(month):
 
 
 def get_period_statistics(start_date, end_date):
-    """Get affiliate statistics for a specific period"""
+    """Get affiliate statistics for a specific period.
 
+    Standalone single-period helper kept for external callers. Delegates to the shared
+    bulk helpers so the void / transaction / click rules live in one place.
+    """
     sales_partner = frappe.db.get_value(
         "Sales Partner", {"custom_user": frappe.session.user}, "name"
     )
@@ -150,48 +179,12 @@ def get_period_statistics(start_date, end_date):
             "unique_clicks": 0,
         }
 
-    start_datetime = frappe.utils.get_datetime(start_date)
-    end_datetime = frappe.utils.get_datetime(end_date).replace(
-        hour=23, minute=59, second=59
+    period_start = getdate(start_date)
+    period_end = getdate(end_date)
+    referrals_by_date, clicks_by_date = fetch_referral_and_click_buckets(
+        sales_partner, period_start, period_end
     )
-
-    sales = frappe.get_all(
-        "Affiliate Referral",
-        filters={
-            "sales_partner": sales_partner,
-            "record_type": "referral",
-            "date": ["between", [start_datetime, end_datetime]],
-            "void": 0,
-        },
-        fields="amount",
-        pluck="amount",
-    )
-    sales_count = len(sales)
-    total_referral_fee = sum(sales)
-
-    clicks_count = frappe.db.count(
-        "Affiliate Click Log",
-        filters={
-            "sales_partner": sales_partner,
-            "time": ["between", [start_datetime, end_datetime]],
-        },
-    )
-    unique_clicks_count = frappe.get_all(
-        "Affiliate Click Log",
-        filters={
-            "sales_partner": sales_partner,
-            "time": ["between", [start_datetime, end_datetime]],
-        },
-        fields=["remote_address"],
-        group_by="remote_address",
-    )
-
-    return {
-        "transactions": sales_count,
-        "referral_fee_earned": total_referral_fee,
-        "clicks": clicks_count or 0,
-        "unique_clicks": len(unique_clicks_count) or 0,
-    }
+    return aggregate_period(referrals_by_date, clicks_by_date, period_start, period_end)
 
 
 @frappe.whitelist(methods=["GET"])
