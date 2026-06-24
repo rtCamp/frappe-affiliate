@@ -62,8 +62,7 @@ def aggregate_period(referrals_by_date, clicks_by_date, period_start, period_end
 
     Single source of truth for the void / transaction / click rules (no DB queries):
       - referral_fee_earned = sum(all referral amounts) - sum(void amounts), rounded to
-        currency precision. Voided referrals stay positive; the void record carries the
-        deduction (and its own date, which may fall in a later period), so a partial void
+        2 decimal places. Voided referrals stay positive; the void record carries the
         keeps its remaining fee.
       - transactions = count of all referrals (a referral that earned commission counts
         even if later voided); the void's earnings impact is still netted above.
