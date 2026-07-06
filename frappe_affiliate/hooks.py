@@ -154,6 +154,9 @@ doc_events = {
         "validate": ["frappe_affiliate.doc_events.subscription.validate"],
         "before_insert": ["frappe_affiliate.doc_events.subscription.before_insert"],
     },
+    "Coupon Code": {
+        "on_update": ["frappe_affiliate.doc_events.coupon_code.on_update"],
+    },
 }
 # Scheduled Tasks
 # ---------------
