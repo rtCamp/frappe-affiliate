@@ -107,8 +107,16 @@ class CouponBatch(Document):
 
         for coupon_name in coupons:
             coupon = frappe.get_doc("Coupon Code", coupon_name)
+            if (coupon.custom_sales_partner != self.sales_partner) and (
+                (coupon.custom_subscription_used_count or 0) > 0
+                or (coupon.used or 0) > 0
+            ):
+                frappe.log_error(
+                    f"Could not update coupon {coupon_name} affiliate as it has already been used."
+                )
+            else:
+                coupon.custom_sales_partner = self.sales_partner
             coupon.custom_apply_to_recurring = self.apply_to_recurring
-            coupon.custom_sales_partner = self.sales_partner
             coupon.custom_subscription_maximum_use = self.subscription_maximum_use
             coupon.custom_maximum_user_use_count = self.maximum_user_use_count
             coupon.valid_from = self.valid_from
