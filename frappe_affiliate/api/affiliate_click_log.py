@@ -1,10 +1,22 @@
 import frappe
-from frappe.utils import escape_html
+from frappe.utils import escape_html, rate_limit
+
+CLICK_RATE_LIMIT = 30
+CLICK_RATE_LIMIT_WINDOW = 60  # seconds
 
 
 def record_click(username, banner=None):
+    """Public entry point. Swallows the rate limit so a throttled click never breaks
+    the caller's redirect flow (`set_cookie` still needs to send the visitor onward)."""
     try:
-        click_log = frappe.new_doc("Affiliate Click Log")
+        return _record_click(username, banner)
+    except frappe.RateLimitExceededError:
+        return
+
+
+@rate_limit(limit=CLICK_RATE_LIMIT, seconds=CLICK_RATE_LIMIT_WINDOW)
+def _record_click(username, banner=None):
+    try:
         user = frappe.db.get_value("User", {"username": username, "enabled": 1}, "name")
         sales_partner = frappe.db.get_value(
             "Sales Partner",
@@ -13,6 +25,8 @@ def record_click(username, banner=None):
         )
         if not sales_partner:
             return
+
+        click_log = frappe.new_doc("Affiliate Click Log")
         click_log.sales_partner = sales_partner
         click_log.time = frappe.utils.now_datetime()
         click_log.user_agent = frappe.local.request.headers.get("User-Agent")
