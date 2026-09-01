@@ -75,29 +75,35 @@ def set_cookie(cookie_route_path, cookie_timeout):
         cookie_split = cookie_val.split("-") if cookie_val else []
         if cookie_val_length == 2 and banner_exists:
             click = record_click(username, banner)
-            new_val = f"{username}-{banner}-{click}"
+            if click:
+                new_val = f"{username}-{banner}-{click}"
         elif cookie_val_length == 2 and not banner_exists:
             if cookie_split[0] != username:
                 click = record_click(username, None)
-                new_val = f"{username}-{click}"
+                if click:
+                    new_val = f"{username}-{click}"
         elif cookie_val_length == 3 and banner_exists:
             if (
                 not cookie_val
                 or "-".join(cookie_val.split("-", 2)[:2]) != f"{username}-{banner}"
             ):
                 click = record_click(username, banner)
-                new_val = f"{username}-{banner}-{click}"
+                if click:
+                    new_val = f"{username}-{banner}-{click}"
         elif cookie_val_length == 3 and not banner_exists:
             if cookie_split[0] != username:
                 click = record_click(username, None)
-                new_val = f"{username}-{click}"
+                if click:
+                    new_val = f"{username}-{click}"
     else:
         if not banner_exists:
             click = record_click(username, None)
-            new_val = f"{username}-{click}"
+            if click:
+                new_val = f"{username}-{click}"
         else:
             click = record_click(username, banner)
-            new_val = f"{username}-{banner}-{click}"
+            if click:
+                new_val = f"{username}-{banner}-{click}"
 
     if new_val:
         response.set_cookie(

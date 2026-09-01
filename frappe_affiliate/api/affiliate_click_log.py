@@ -1,5 +1,6 @@
 import frappe
-from frappe.utils import escape_html, rate_limit
+from frappe.rate_limiter import rate_limit
+from frappe.utils import escape_html
 
 CLICK_RATE_LIMIT = 30
 CLICK_RATE_LIMIT_WINDOW = 60  # seconds
