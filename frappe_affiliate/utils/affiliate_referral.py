@@ -5,7 +5,6 @@ from frappe.utils import getdate
 from frappe_affiliate.utils.sales_partner import is_user_affiliate
 
 
-@frappe.whitelist(methods=["POST"])
 def insert_manual_affiliate_referral(
     affiliate: str,
     amount: float,
