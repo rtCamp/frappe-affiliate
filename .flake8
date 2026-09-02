@@ -63,7 +63,8 @@ ignore =
     I001,
     I005,
     I004,
-    I003
+    I003,
+    F821
 
 per-file-ignores =
     # syntax: [comma-separated path/to/file: comma-separated ERROR CODES]

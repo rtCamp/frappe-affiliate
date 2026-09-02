@@ -1,5 +1,6 @@
 # Copyright (c) 2025, rtCamp and contributors
 # For license information, please see license.txt
+# ruff: noqa: F821  # DF.Literal[...] options in the auto-generated types block
 
 import frappe
 from frappe import _

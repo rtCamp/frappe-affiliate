@@ -1,8 +1,9 @@
+import json
 from urllib.parse import urlencode
 
 import frappe
 from frappe import local
-from frappe.utils import get_url
+from frappe.utils import cint, escape_html, get_url
 from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers import Response
 
@@ -170,24 +171,30 @@ def check_banner_embed(banner_text_link_route_path):
     affiliate_link = get_url(affiliate_link)
 
     if item_type == "Text Link":
-        js = f"""
-        (function () {{
-            var data = '<a href="{affiliate_link}?banner={banner_text_link.name}" rel="nofollow" target="_top">{title}</a>';
-            document.write(data);
-        }})();
-        """
+        markup = (
+            f'<a href="{escape_html(affiliate_link)}?banner={escape_html(banner_text_link.name)}" '
+            f'rel="nofollow" target="_top">{escape_html(title)}</a>'
+        )
     else:
         target_attr = (
             "_blank" if banner_text_link.get("open_in_new_window", False) else "_top"
         )
-        js = f"""
-        (function () {{
-            var data = '<a href="{affiliate_link}?banner={banner_text_link.name}" rel="nofollow" target="{target_attr}">'
-            + '<img src="{banner_url}" border="0" alt="{title}" width="100%" style="max-width:{banner_text_link.width or 728}px">'
-            + '</a>';
-            document.write(data);
-        }})();
-        """
+        width = cint(banner_text_link.width) or 728
+        markup = (
+            f'<a href="{escape_html(affiliate_link)}?banner={escape_html(banner_text_link.name)}" '
+            f'rel="nofollow" target="{target_attr}">'
+            f'<img src="{escape_html(banner_url)}" border="0" alt="{escape_html(title)}" '
+            f'width="100%" style="max-width:{width}px"></a>'
+        )
+
+    # markup is HTML-escaped above; json.dumps then makes it a safe JS string
+    # literal so it can't break out of the `var data = ...;` statement either.
+    js = f"""
+    (function () {{
+        var data = {json.dumps(markup)};
+        document.write(data);
+    }})();
+    """
 
     raise HTTPException(response=Response(js, content_type="application/javascript"))
 
