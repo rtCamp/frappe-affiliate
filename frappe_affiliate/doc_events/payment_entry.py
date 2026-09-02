@@ -50,7 +50,7 @@ def record_referral(sales_invoice_doc, payment_entry_doc):
     if keyword:
         referral.keyword = keyword
 
-    referral.save()
+    referral.save(ignore_permissions=True)
 
     if frappe.get_single_value("Affiliate Settings", "enable_tier_2"):
         referral_2 = record_referral_tiers(
@@ -122,7 +122,7 @@ def record_referral_tiers(referral, invoice, payment_entry, tier):
             "record_type": "referral",
             "tier": tier - 1,
         }
-    ).save()
+    ).save(ignore_permissions=True)
 
     return new_referral
 
