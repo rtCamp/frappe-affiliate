@@ -1,5 +1,6 @@
 # Copyright (c) 2025, rtCamp and contributors
 # For license information, please see license.txt
+# ruff: noqa: F821  # DF.Literal[...] options in the auto-generated types block
 
 import frappe
 from frappe.model.document import Document
@@ -37,6 +38,7 @@ class AffiliateReferral(Document):
                     method=self.make_void,
                     queue="short",
                     job_name=f"Make Affiliate Referral {self.name} Void",
+                    enqueue_after_commit=True,
                 )
 
     def make_void(self):

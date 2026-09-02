@@ -1,10 +1,9 @@
-import html
 import json
 from urllib.parse import urlencode
 
 import frappe
 from frappe import local
-from frappe.utils import cint, get_url
+from frappe.utils import cint, escape_html, get_url
 from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers import Response
 
@@ -173,8 +172,8 @@ def check_banner_embed(banner_text_link_route_path):
 
     if item_type == "Text Link":
         markup = (
-            f'<a href="{html.escape(affiliate_link)}?banner={html.escape(banner_text_link.name)}" '
-            f'rel="nofollow" target="_top">{html.escape(title)}</a>'
+            f'<a href="{escape_html(affiliate_link)}?banner={escape_html(banner_text_link.name)}" '
+            f'rel="nofollow" target="_top">{escape_html(title)}</a>'
         )
     else:
         target_attr = (
@@ -182,9 +181,9 @@ def check_banner_embed(banner_text_link_route_path):
         )
         width = cint(banner_text_link.width) or 728
         markup = (
-            f'<a href="{html.escape(affiliate_link)}?banner={html.escape(banner_text_link.name)}" '
+            f'<a href="{escape_html(affiliate_link)}?banner={escape_html(banner_text_link.name)}" '
             f'rel="nofollow" target="{target_attr}">'
-            f'<img src="{html.escape(banner_url)}" border="0" alt="{html.escape(title)}" '
+            f'<img src="{escape_html(banner_url)}" border="0" alt="{escape_html(title)}" '
             f'width="100%" style="max-width:{width}px"></a>'
         )
 
