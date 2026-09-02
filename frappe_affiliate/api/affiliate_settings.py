@@ -3,6 +3,15 @@ import re
 import frappe
 
 
+def _is_active_affiliate(user):
+    return bool(
+        frappe.db.exists(
+            "Sales Partner",
+            {"custom_user": user, "custom_banned": 0, "custom_disabled": 0},
+        )
+    )
+
+
 @frappe.whitelist()
 def get_banners_and_text_links(
     name: str | None = None,
@@ -12,6 +21,9 @@ def get_banners_and_text_links(
     return_disabled = False
     if frappe.has_permission("Affiliate Settings", "write") is True:
         return_disabled = True
+    if not return_disabled and not _is_active_affiliate(frappe.session.user):
+        return []
+
     user_groups = frappe.get_all(
         "User Group Member",
         filters={"user": frappe.session.user, "parenttype": "User Group"},
@@ -93,6 +105,8 @@ def get_banner_and_text_link_categories():
     return_disabled = False
     if frappe.has_permission("Affiliate Settings", "write") is True:
         return_disabled = True
+    if not return_disabled and not _is_active_affiliate(frappe.session.user):
+        return []
 
     filters = {"disabled": 0, "category": ["is", "set"]}
     if not return_disabled:
