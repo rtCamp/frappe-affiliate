@@ -4,23 +4,6 @@ import frappe
 
 
 @frappe.whitelist()
-def get_affiliate_cookie_timeout():
-    return frappe.db.get_single_value("Affiliate Settings", "cookie_timeout") or 1
-
-
-@frappe.whitelist()
-def get_affiliate_settings():
-    settings = frappe.get_single("Affiliate Settings")
-    return {
-        "cookie_timeout": settings.cookie_timeout or 1,
-        "minimum_payout": settings.minimum_payout or 0,
-        "delay_payout_days": settings.delay_payout_days or 0,
-        "enable_keywords_support": settings.enable_keywords_support,
-        "intro_text_on_affiliate_info_page": settings.intro_text_on_affiliate_info_page,
-    }
-
-
-@frappe.whitelist()
 def get_banners_and_text_links(
     name: str | None = None,
     type_filter: str | None = None,
@@ -146,7 +129,6 @@ def update_banner_and_text_link(banner_id: str, **kwargs):
         return {"success": False, "message": "Banner not found"}
 
 
-@frappe.whitelist()
 def get_affiliate_marketing_materials():
     marketing_materials = frappe.get_all(
         "Affiliate Marketing Material",
